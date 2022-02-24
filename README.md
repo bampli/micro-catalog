@@ -2,7 +2,7 @@
 Fc2 micro-catalog api backend
 
 
-## Install
+## Setup
 
 Generated with latest LTS version.
 
@@ -18,6 +18,9 @@ npm i -g @loopback/cli
 
 # Create app accepting all defaults
 lb4
+
+# Enable write to Elastic data
+chmod 777 .docker/elasticdata
 
 ```
 
