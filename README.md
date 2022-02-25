@@ -31,6 +31,9 @@ docker logs -f --tail 100 micro-catalog-app
 
 lb4 datasource
 
+# debug with loopback cli
+export DEBUG=loopback:cli:utils
+
 ```
 
 ## Versions

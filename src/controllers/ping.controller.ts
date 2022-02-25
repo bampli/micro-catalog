@@ -54,6 +54,7 @@ export class PingController {
     };
   }
 
+
   @get('/categories')
   async index() {
     await this.categoryRepo.create({
