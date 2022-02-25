@@ -1,6 +1,6 @@
 # micro-catalog
-Fc2 micro-catalog api backend
 
+Fc2 micro-catalog api backend
 
 ## Setup
 
@@ -28,5 +28,19 @@ chmod 777 .docker/elasticdata
 
 ```
 docker logs -f --tail 100 micro-catalog-app
+
+lb4 datasource
+
+# debug with loopback cli
+export DEBUG=loopback:cli:utils
+
+```
+
+## Versions
+
+```
+
+# Custom Loopback connector by codeedu
+loopback-connector-esv6 "https://github.com/codeedu/loopback-connector-elastic-search/tarball/master"
 
 ```
