@@ -1,0 +1,14 @@
+curl -XGET "http://elasticsearch:9200/catalog/_search" -H 'Content-Type: application/json' -d'
+{
+  "query": {
+    "bool": {
+      "filter": [
+        {
+          "term": {
+            "docType": "Category"
+          }
+        }
+      ]
+    }
+  }
+}'

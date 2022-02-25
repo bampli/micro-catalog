@@ -1,8 +1,10 @@
 import {inject} from '@loopback/core';
+import {repository} from '@loopback/repository';
 import {
   get, Request, response,
   ResponseObject, RestBindings
 } from '@loopback/rest';
+import {CategoryRepository} from '../repositories';
 
 /**
  * OpenAPI response for ping()
@@ -37,6 +39,8 @@ const PING_RESPONSE: ResponseObject = {
 export class PingController {
   constructor(@inject(RestBindings.Http.REQUEST) private req: Request) { }
 
+  @repository(CategoryRepository) private categoryRepo: CategoryRepository;
+
   // Map to `GET /ping`
   @get('/ping')
   @response(200, PING_RESPONSE)
@@ -48,5 +52,15 @@ export class PingController {
       url: this.req.url,
       headers: Object.assign({}, this.req.headers),
     };
+  }
+
+  @get('/categories')
+  async index() {
+    await this.categoryRepo.create({
+      id: '1',
+      name: 'minah categoria',
+      description: 'minha descrição'
+    });
+    return this.categoryRepo.find()
   }
 }
