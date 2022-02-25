@@ -29,6 +29,8 @@ chmod 777 .docker/elasticdata
 ```
 docker logs -f --tail 100 micro-catalog-app
 
+lb4 datasource
+
 ```
 
 ## Versions
