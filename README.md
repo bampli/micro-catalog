@@ -43,4 +43,7 @@ export DEBUG=loopback:cli:utils
 # Custom Loopback connector by codeedu
 loopback-connector-esv6 "https://github.com/codeedu/loopback-connector-elastic-search/tarball/master"
 
+amqplib @0.8.0
+@types/amqplib @0.8.2
+
 ```

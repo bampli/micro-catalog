@@ -1,20 +1,6 @@
 import {inject, lifeCycleObserver, LifeCycleObserver} from '@loopback/core';
 import {juggler} from '@loopback/repository';
-
-const config = {
-  name: 'esv7',
-  connector: 'esv6',
-  index: 'catalog',
-  version: 7,
-  debug: process.env.APP_ENV === 'dev',
-  //defaultSize: '',  // keep commented
-  configuration: {
-    node: process.env.ELASTIC_SEARCH_HOST,
-    requestTimeout: process.env.ELASTIC_SEARCH_REQUEST_TIMEOUT,
-    pingTimeout: process.env.ELASTIC_SEARCH_PING_TIMEOUT
-  },
-  mappingProperties: {}
-};
+import config from './esv7.datasource.config';
 
 // Observe application's life cycle to disconnect the datasource when
 // application is stopped. This allows the application to be shut down
