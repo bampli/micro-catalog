@@ -1,3 +1,4 @@
+// NOT BEING USED!
 import {ApplicationConfig} from '@loopback/core';
 import {MicroCatalogApplication} from './application';
 
