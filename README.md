@@ -26,7 +26,7 @@ chmod 777 .docker/elasticdata
 
 ## Templates
 
-![Screenshot from 2022-02-28 15-25-44](https://user-images.githubusercontent.com/86032/156037652-c41f099d-8606-45da-8086-3b05ed166fde.png)
+![Screenshot from 2022-02-28 15-39-41](https://user-images.githubusercontent.com/86032/156039490-7ec5fa96-5a6a-49e1-a53a-c06a6b551de1.png)
 
 ```
 docker logs -f --tail 100 micro-catalog-app
