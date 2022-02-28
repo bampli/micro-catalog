@@ -2,6 +2,13 @@ import {Context} from "@loopback/context";
 import {Server} from "@loopback/core";
 import {Channel, connect, Connection} from "amqplib";
 
+// Comunicação usando rabbitmq:
+// - disparar uma mensagem a cada evento de cada model do Laravel:
+//     createInflateRaw, editar, excluir, relacionamentos
+// - vários microserviços poderão ser notificados dos eventos que ocorreram
+// - alguns microserviços poderão querer ser notificados somente de alguns eventos:
+//    "somente quando tiver novos uploads"
+
 export class RabbitmqServer extends Context implements Server {
   private _listening: boolean;
   conn: Connection;
