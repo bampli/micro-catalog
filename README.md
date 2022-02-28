@@ -29,7 +29,11 @@ chmod 777 .docker/elasticdata
 ```
 docker logs -f --tail 100 micro-catalog-app
 
+lb4 model
 lb4 datasource
+lb4 repository
+
+export class RabbitmqServer extends Context implements Server {}
 
 # debug with loopback cli
 export DEBUG=loopback:cli:utils
