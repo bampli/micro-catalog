@@ -13,7 +13,7 @@ export async function main(options: ApplicationConfig = {}) {
   const restServer = app.getSync<RestServer>('servers.RestServer');
   const url = restServer.url;
   console.log(`Server is running at ${url}`);
-  console.log(`Elasticsearch configured at ${process.env.ELASTIC_SEARCH_HOST}`);
+  console.log(`Elastic is running at ${process.env.ELASTIC_SEARCH_HOST}`);
   console.log(`Try ${url}/ping`);
 
   return app;

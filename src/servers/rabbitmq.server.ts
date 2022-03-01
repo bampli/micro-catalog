@@ -5,19 +5,21 @@ import {Channel, connect, Connection, Replies} from "amqplib";
 import {Category} from '../models';
 import {CategoryRepository} from "../repositories";
 
-// Comunicação usando rabbitmq:
-// - disparar uma mensagem a cada evento de cada model do Laravel:
-//     createInflateRaw, editar, excluir, relacionamentos
-// - vários microserviços poderão ser notificados dos eventos que ocorreram
-// - alguns microserviços poderão querer ser notificados somente de alguns eventos:
-//    "somente quando tiver novos uploads"
-
+// A comunicação Codeflix utilizando Rabbitmq consiste em:
+// - disparar uma mensagem em cada evento de cada model do Laravel:
+//     - criar, editar, excluir, relacionamentos
+// - microserviços poderão ser notificados:
+//     - de todos os eventos ocorridos
+//     - de apenas alguns eventos ocorridos
+//         - somente em caso de novos uploads
+//
 // Status:
 //   - ack:     acknowledged
 //   - nack:    rejected
 //   - unacked: waiting for acknowledgement/rejection
 //
-// Sample: {"id": "uuid2", "name": "novo nome 2"}
+// Samples:
+//   - {"id": "uuid2", "name": "novo nome 2", "created_at": "2020-01-01T00:00","updated_at": "2020-01-01T00:01"}
 
 export class RabbitmqServer extends Context implements Server {
   private _listening: boolean;
@@ -57,7 +59,9 @@ export class RabbitmqServer extends Context implements Server {
         .then(() => this.channel.ack(message))
         .catch(() => this.channel.reject(message, false));
       //console.log(model, event);
-    }).then(() => { }).catch(() => { });
+    })
+      .then(() => { })
+      .catch(() => { });
   }
 
   async sync({model, event, data}: {model: string, event: string, data: Category}) {
@@ -67,13 +71,16 @@ export class RabbitmqServer extends Context implements Server {
           await this.categoryRepo.create({
             ...data,
             // eslint-disable-next-line @typescript-eslint/naming-convention
-            created_at: new Date(),
+            created_at: new Date().toISOString(),
             // eslint-disable-next-line @typescript-eslint/naming-convention
-            updated_at: new Date()
+            updated_at: new Date().toISOString()
           });
           break;
+        case 'updated':
+          await this.categoryRepo.updateById(data.id, data);
+          break;
         case 'deleted':
-          console.log("delete a category");
+          await this.categoryRepo.deleteById(data.id);
           break;
       }
     }
