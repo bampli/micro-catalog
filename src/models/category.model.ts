@@ -17,6 +17,12 @@ export class Category extends Entity {
   name: string;
 
   @property({
+    type: 'string',
+    required: false,
+  })
+  description: string;
+
+  @property({
     type: 'boolean',
     required: false
   })
