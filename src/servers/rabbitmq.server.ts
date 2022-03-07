@@ -33,9 +33,9 @@ export class RabbitmqServer extends Context implements Server {
 
   async start(): Promise<void> {
     this.conn = await connect({
-      hostname: 'rabbitmq',
-      username: 'admin',
-      password: 'admin'
+      hostname: process.env.RABBITMQ_HOST,
+      username: process.env.RABBITMQ_USERNAME,
+      password: process.env.RABBITMQ_PASSWORD,
     });
     this._listening = true;
     // eslint-disable-next-line @typescript-eslint/no-floating-promises

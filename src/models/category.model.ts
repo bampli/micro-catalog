@@ -19,15 +19,17 @@ export class Category extends Entity {
   @property({
     type: 'string',
     required: false,
+    default: ''
   })
   description: string;
 
   @property({
     type: 'boolean',
-    required: false
+    required: false,
+    default: true
   })
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  is_active = true;
+  is_active: boolean;
 
   @property({
     type: 'date',
