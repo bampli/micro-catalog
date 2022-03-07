@@ -1,11 +1,14 @@
 import {Context, inject} from "@loopback/context";
-import {ApplicationConfig, CoreBindings, Server} from "@loopback/core";
+import {Application, ApplicationConfig, CoreBindings, Server} from "@loopback/core";
 import {repository} from "@loopback/repository";
 import {Channel, ConfirmChannel, Connection, Options, Replies} from "amqplib";
 import {RabbitmqBindings} from '../keys';
 import {Category} from '../models';
 import {CategoryRepository} from "../repositories";
 import {AmqpConnectionManager, AmqpConnectionManagerOptions, ChannelWrapper, connect} from 'amqp-connection-manager';
+import {MetadataInspector} from '@loopback/metadata';
+import {RabbitmqSubscribeMetadata, RABBITMQ_SUBSCRIBE_DECORATOR} from '../decorators/rabbitmq-subscribe.decorator';
+import {CategorySyncService} from '../services';
 
 export interface RabbitmqConfig {
   uri: string;
@@ -19,10 +22,11 @@ export class RabbitmqServer extends Context implements Server {
   channel: Channel;
 
   constructor(
+    @inject(CoreBindings.APPLICATION_INSTANCE) public app: Application,
     @repository(CategoryRepository) private categoryRepo: CategoryRepository,
     @inject(RabbitmqBindings.CONFIG) private config: RabbitmqConfig
   ) {
-    super();
+    super(app);
     console.log("Config->", config);
     //console.log(this.categoryRepo);
   }
@@ -40,6 +44,14 @@ export class RabbitmqServer extends Context implements Server {
       console.log(`Failed connection to RabbitMQ channel - name: ${name} | error: ${err.message}`);
     });
     await this.setupExchanges();
+
+    const service = this.getSync<CategorySyncService>('services.CategorySyncService');
+    const metadata = MetadataInspector.getAllMethodMetadata<RabbitmqSubscribeMetadata>(
+      RABBITMQ_SUBSCRIBE_DECORATOR,
+      service
+    );
+    console.log("Metadata->", metadata);
+    console.log("Handler->", (metadata as any)['handler'].exchange);
 
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     //this.boot();
