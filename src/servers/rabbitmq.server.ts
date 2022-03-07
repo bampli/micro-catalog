@@ -1,7 +1,8 @@
-import {Context} from "@loopback/context";
-import {Server} from "@loopback/core";
+import {Context, inject} from "@loopback/context";
+import {ApplicationConfig, CoreBindings, Server} from "@loopback/core";
 import {repository} from "@loopback/repository";
 import {Channel, connect, Connection, Replies} from "amqplib";
+import {RabbitmqBindings} from '../keys';
 import {Category} from '../models';
 import {CategoryRepository} from "../repositories";
 
@@ -26,17 +27,22 @@ export class RabbitmqServer extends Context implements Server {
   conn: Connection;
   channel: Channel;
 
-  constructor(@repository(CategoryRepository) private categoryRepo: CategoryRepository) {
+  constructor(
+    @repository(CategoryRepository) private categoryRepo: CategoryRepository,
+    @inject(RabbitmqBindings.CONFIG) private config: {uri: string}
+  ) {
     super();
+    console.log("Config->", config);
     //console.log(this.categoryRepo);
   }
 
   async start(): Promise<void> {
-    this.conn = await connect({
-      hostname: process.env.RABBITMQ_HOST,
-      username: process.env.RABBITMQ_USERNAME,
-      password: process.env.RABBITMQ_PASSWORD,
-    });
+    this.conn = await connect(this.config.uri);
+    // this.conn = await connect({
+    //   hostname: process.env.RABBITMQ_HOST,
+    //   username: process.env.RABBITMQ_USERNAME,
+    //   password: process.env.RABBITMQ_PASSWORD,
+    // });
     this._listening = true;
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     this.boot();
