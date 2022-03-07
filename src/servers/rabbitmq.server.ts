@@ -1,7 +1,7 @@
 import {Context, inject} from "@loopback/context";
 import {ApplicationConfig, CoreBindings, Server} from "@loopback/core";
 import {repository} from "@loopback/repository";
-import {Channel, Connection, Replies} from "amqplib";
+import {Channel, ConfirmChannel, Connection, Options, Replies} from "amqplib";
 import {RabbitmqBindings} from '../keys';
 import {Category} from '../models';
 import {CategoryRepository} from "../repositories";
@@ -10,6 +10,7 @@ import {AmqpConnectionManager, AmqpConnectionManagerOptions, ChannelWrapper, con
 export interface RabbitmqConfig {
   uri: string;
   connOptions?: AmqpConnectionManagerOptions;
+  exchanges?: {name: string, type: string, options?: Options.AssertExchange}[];
 }
 export class RabbitmqServer extends Context implements Server {
   private _listening: boolean;
@@ -29,16 +30,30 @@ export class RabbitmqServer extends Context implements Server {
   async start(): Promise<void> {
     this._conn = connect([this.config.uri], this.config.connOptions);
     this._channelManager = this.conn.createChannel();
-    this._channelManager.on('connect', () => {
+
+    this.channelManager.on('connect', () => {
       this._listening = true;
       console.log('Successful connection to RabbitMQ channel');
     });
-    this._channelManager.on('error', (err, {name}) => {
+    this.channelManager.on('error', (err, {name}) => {
       this._listening = false;
       console.log(`Failed connection to RabbitMQ channel - name: ${name} | error: ${err.message}`);
     });
+    await this.setupExchanges();
+
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     //this.boot();
+  }
+
+  private async setupExchanges() {
+    return this.channelManager.addSetup(async (channel: ConfirmChannel) => {
+      if (!this.config.exchanges) {
+        return;
+      }
+      await Promise.all(this.config.exchanges.map((exchange) => (
+        channel.assertExchange(exchange.name, exchange.type, exchange.options)
+      )))
+    })
   }
 
   async boot() {
@@ -97,6 +112,10 @@ export class RabbitmqServer extends Context implements Server {
 
   get conn(): AmqpConnectionManager {
     return this._conn;
+  }
+
+  get channelManager(): ChannelWrapper {
+    return this._channelManager;
   }
 }
 
