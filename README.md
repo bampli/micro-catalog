@@ -51,5 +51,6 @@ loopback-connector-esv6 "https://github.com/codeedu/loopback-connector-elastic-s
 
 amqplib @0.8.0
 @types/amqplib @0.8.2
+amqplib amqp-connection-manager @4.1.1
 
 ```
