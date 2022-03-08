@@ -1,4 +1,4 @@
-import {bind, injectable, /* inject, */ BindingScope} from '@loopback/core';
+import {bind, /* inject, */ BindingScope} from '@loopback/core';
 import {rabbitmqSubscribe} from '../decorators/rabbitmq-subscribe.decorator';
 import {repository} from "@loopback/repository";
 import {CategoryRepository} from "../repositories";
@@ -14,8 +14,8 @@ export class CategorySyncService {
     queue: 'x',
     routingKey: 'model.category.*'
   })
-  handler() {
-    console.log(this.categoryRepo.entityClass, 'handler');
+  handler({data}: {data: any}) {
+    console.log("Handler->", data);
   }
 
   @rabbitmqSubscribe({
@@ -23,8 +23,8 @@ export class CategorySyncService {
     queue: 'x1',
     routingKey: 'model.category1.*'
   })
-  handler1() {
-    console.log(this.categoryRepo.entityClass, 'handler1');
+  handler1({data}: {data: any}) {
+    console.log("Handler1->", data);
   }
 
 }

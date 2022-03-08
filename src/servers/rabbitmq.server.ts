@@ -1,15 +1,12 @@
 import {Binding, Context, inject} from "@loopback/context";
-import {Application, ApplicationConfig, CoreBindings, Server} from "@loopback/core";
+import {Application, CoreBindings, Server} from "@loopback/core";
 import {repository} from "@loopback/repository";
-import {Channel, ConfirmChannel, Connection, Options, Replies} from "amqplib";
+import {Channel, ConfirmChannel, Options} from "amqplib";
 import {RabbitmqBindings} from '../keys';
-import {Category} from '../models';
 import {CategoryRepository} from "../repositories";
 import {AmqpConnectionManager, AmqpConnectionManagerOptions, ChannelWrapper, connect} from 'amqp-connection-manager';
 import {MetadataInspector} from '@loopback/metadata';
 import {RabbitmqSubscribeMetadata, RABBITMQ_SUBSCRIBE_DECORATOR} from '../decorators/rabbitmq-subscribe.decorator';
-import {CategorySyncService} from '../services';
-import {AnyScopeFilterSchema} from '@loopback/rest';
 
 export interface RabbitmqConfig {
   uri: string;
@@ -46,13 +43,6 @@ export class RabbitmqServer extends Context implements Server {
     });
     await this.setupExchanges();
     await this.bindSubscribers();
-
-    // console.log("Subscribers->", this.getSubscribers());
-    // console.log("Subscribers-0->", this.getSubscribers()[0][0]['method']());
-    // console.log("Subscribers-1->", this.getSubscribers()[0][1]['method']());
-
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    //this.boot();
   }
 
   private async setupExchanges() {
@@ -81,7 +71,12 @@ export class RabbitmqServer extends Context implements Server {
 
           await Promise.all(
             routingKeys.map((x) => channel.bindQueue(assertQueue.queue, exchange, x))
-          )
+          );
+          await this.consume({
+            channel,
+            queue: assertQueue.queue,
+            method: item.method
+          });
 
         });
       })
@@ -123,49 +118,33 @@ export class RabbitmqServer extends Context implements Server {
       }, [])
   }
 
-  async boot() {
-    // @ts-ignore
-    this.channel = await this._conn.createChannel();
-    const queue: Replies.AssertQueue = await this.channel.assertQueue('micro-catalog/sync-videos');
-    const exchange: Replies.AssertExchange = await this.channel.assertExchange('amq.topic', 'topic');
+  private async consume(
+    {channel, queue, method}: {channel: ConfirmChannel, queue: string, method: Function}
+  ) {
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    await channel.consume(queue, async (message) => {
+      try {
+        if (!message) {
+          throw new Error('Received null message');
+        }
 
-    await this.channel.bindQueue(queue.queue, exchange.exchange, 'model.*.*');
-
-    this.channel.consume(queue.queue, (message) => {
-      if (!message) {return };
-      //console.log(message);
-      const data: Category = JSON.parse(message.content.toString());
-      const [model, event] = message.fields.routingKey.split('.').slice(1);
-      this
-        .sync({model, event, data})
-        .then(() => this.channel.ack(message))
-        .catch(() => this.channel.reject(message, false));
-      //console.log(model, event);
-    })
-      .then(() => { })
-      .catch(() => { });
-  }
-
-  async sync({model, event, data}: {model: string, event: string, data: Category}) {
-    if (model === 'category') {
-      switch (event) {
-        case 'created':
-          await this.categoryRepo.create({
-            ...data,
-            // eslint-disable-next-line @typescript-eslint/naming-convention
-            created_at: new Date().toISOString(),
-            // eslint-disable-next-line @typescript-eslint/naming-convention
-            updated_at: new Date().toISOString()
-          });
-          break;
-        case 'updated':
-          await this.categoryRepo.updateById(data.id, data);
-          break;
-        case 'deleted':
-          await this.categoryRepo.deleteById(data.id);
-          break;
+        const content = message.content;
+        if (content) {
+          let data;
+          try {
+            data = JSON.parse(content.toString());
+          } catch (e) {
+            data = null;
+          }
+          console.log("Message->", data);
+          await method({data, message, channel});
+          channel.ack(message);
+        }
+      } catch (e) {
+        console.error(e);
+        //politica respostas
       }
-    }
+    });
   }
 
   async stop(): Promise<void> {
@@ -185,6 +164,57 @@ export class RabbitmqServer extends Context implements Server {
     return this._channelManager;
   }
 }
+
+// console.log("Subscribers->", this.getSubscribers());
+// console.log("Subscribers-0->", this.getSubscribers()[0][0]['method']());
+// console.log("Subscribers-1->", this.getSubscribers()[0][1]['method']());
+// this.boot();
+
+// async boot() {
+//   // @ts-ignore
+//   this.channel = await this._conn.createChannel();
+//   const queue: Replies.AssertQueue = await this.channel.assertQueue('micro-catalog/sync-videos');
+//   const exchange: Replies.AssertExchange = await this.channel.assertExchange('amq.topic', 'topic');
+
+//   await this.channel.bindQueue(queue.queue, exchange.exchange, 'model.*.*');
+
+//   this.channel.consume(queue.queue, (message) => {
+//     if (!message) {return };
+//     //console.log(message);
+//     const data: Category = JSON.parse(message.content.toString());
+//     const [model, event] = message.fields.routingKey.split('.').slice(1);
+//     this
+//       .sync({model, event, data})
+//       .then(() => this.channel.ack(message))
+//       .catch(() => this.channel.reject(message, false));
+//     //console.log(model, event);
+//   })
+//     .then(() => { })
+//     .catch(() => { });
+// }
+
+// async sync({model, event, data}: {model: string, event: string, data: Category}) {
+//   if (model === 'category') {
+//     switch (event) {
+//       case 'created':
+//         await this.categoryRepo.create({
+//           ...data,
+//           // eslint-disable-next-line @typescript-eslint/naming-convention
+//           created_at: new Date().toISOString(),
+//           // eslint-disable-next-line @typescript-eslint/naming-convention
+//           updated_at: new Date().toISOString()
+//         });
+//         break;
+//       case 'updated':
+//         await this.categoryRepo.updateById(data.id, data);
+//         break;
+//       case 'deleted':
+//         await this.categoryRepo.deleteById(data.id);
+//         break;
+//     }
+//   }
+// }
+
 
 // A comunicação Codeflix utilizando Rabbitmq consiste em:
 // - disparar uma mensagem em cada evento de cada model do Laravel:
