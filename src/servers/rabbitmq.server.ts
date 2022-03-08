@@ -9,6 +9,7 @@ import {AmqpConnectionManager, AmqpConnectionManagerOptions, ChannelWrapper, con
 import {MetadataInspector} from '@loopback/metadata';
 import {RabbitmqSubscribeMetadata, RABBITMQ_SUBSCRIBE_DECORATOR} from '../decorators/rabbitmq-subscribe.decorator';
 import {CategorySyncService} from '../services';
+import {AnyScopeFilterSchema} from '@loopback/rest';
 
 export interface RabbitmqConfig {
   uri: string;
@@ -44,12 +45,11 @@ export class RabbitmqServer extends Context implements Server {
       console.log(`Failed connection to RabbitMQ channel - name: ${name} | error: ${err.message}`);
     });
     await this.setupExchanges();
+    await this.bindSubscribers();
 
-    //console.log("Subscribers->", this.getSubscribers());
-    // @ts-ignore
-    console.log("Subscribers-0->", this.getSubscribers()[0][0]['method']());
-    // @ts-ignore
-    console.log("Subscribers-1->", this.getSubscribers()[0][1]['method']());
+    // console.log("Subscribers->", this.getSubscribers());
+    // console.log("Subscribers-0->", this.getSubscribers()[0][0]['method']());
+    // console.log("Subscribers-1->", this.getSubscribers()[0][1]['method']());
 
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     //this.boot();
@@ -66,42 +66,61 @@ export class RabbitmqServer extends Context implements Server {
     })
   }
 
-  private getSubscribers() {
+  private async bindSubscribers() {
+    this
+      .getSubscribers()
+      .map(async (item) => {
+        await this.channelManager.addSetup(async (channel: ConfirmChannel) => {
+          const {exchange, queue, routingKey, queueOptions} = item.metadata;
+          const assertQueue = await channel.assertQueue(
+            queue ?? '',
+            queueOptions ?? undefined
+          );
+
+          const routingKeys = Array.isArray(routingKey) ? routingKey : [routingKey];
+
+          await Promise.all(
+            routingKeys.map((x) => channel.bindQueue(assertQueue.queue, exchange, x))
+          )
+
+        });
+      })
+  }
+
+  private getSubscribers(): {method: Function, metadata: RabbitmqSubscribeMetadata}[] {
     const bindings: Array<Readonly<Binding>> = this.find('services.*');
 
     //service1, service2, service3
     //[methods that use the decorator], [], []
-    return bindings.map(
-      binding => {
-        const metadata = MetadataInspector.getAllMethodMetadata<RabbitmqSubscribeMetadata>(
-          RABBITMQ_SUBSCRIBE_DECORATOR,
-          binding.valueConstructor?.prototype
-        );
-        if (!metadata) {  //{methodname1: {}, methodname2: {}}
-          return [];
-        }
-        const methods = [];
-        for (const methodName in metadata) {
-          if (!Object.prototype.hasOwnProperty.call(metadata, methodName)) {
-            return;
+    return bindings
+      .map(
+        binding => {
+          const metadata = MetadataInspector.getAllMethodMetadata<RabbitmqSubscribeMetadata>(
+            RABBITMQ_SUBSCRIBE_DECORATOR,
+            binding.valueConstructor?.prototype
+          );
+          if (!metadata) {  //{methodname1: {}, methodname2: {}}
+            return [];
           }
-          const service = this.getSync(binding.key) as any;
+          const methods = [];
+          for (const methodName in metadata) {
+            if (!Object.prototype.hasOwnProperty.call(metadata, methodName)) {
+              return;
+            }
+            const service = this.getSync(binding.key) as any;
 
-          methods.push({
-            method: service[methodName].bind(service),
-            metadata: metadata[methodName]
-          })
+            methods.push({
+              method: service[methodName].bind(service),
+              metadata: metadata[methodName]
+            })
+          }
+          return methods;
         }
-        return methods;
-      }
-    );
-
-    // const service = this.getSync<CategorySyncService>('services.CategorySyncService');
-
-    // console.log("Metadata->", metadata);
-    // // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    // console.log("Handler->", (metadata as any)['handler'].exchange);
-
+      )
+      .reduce((collection: any, item: any) => {
+        collection.push(...item);
+        return collection;
+      }, [])
   }
 
   async boot() {

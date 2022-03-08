@@ -1,9 +1,9 @@
-import {injectable, /* inject, */ BindingScope} from '@loopback/core';
+import {bind, injectable, /* inject, */ BindingScope} from '@loopback/core';
 import {rabbitmqSubscribe} from '../decorators/rabbitmq-subscribe.decorator';
 import {repository} from "@loopback/repository";
 import {CategoryRepository} from "../repositories";
 
-@injectable({scope: BindingScope.TRANSIENT})
+@bind({scope: BindingScope.TRANSIENT})
 export class CategorySyncService {
   constructor(
     @repository(CategoryRepository) private categoryRepo: CategoryRepository,
@@ -20,7 +20,7 @@ export class CategorySyncService {
 
   @rabbitmqSubscribe({
     exchange: 'amq.topic',
-    queue: 'x',
+    queue: 'x1',
     routingKey: 'model.category1.*'
   })
   handler1() {
