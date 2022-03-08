@@ -60,8 +60,22 @@ export class PingController {
     await this.categoryRepo.create({
       id: '1',
       name: 'minah categoria',
-      description: 'minha descrição'
+      created_at: "2020-01-01T00:00",
+      updated_at: "2020-01-01T00:01"
+      //description: 'minha descrição'
     });
     return this.categoryRepo.find()
   }
 }
+
+// [
+//   {
+//       "id": "1",
+//       "name": "minah categoria",
+//       "is_active": true,
+//       "created_at": "2022-02-27T15:15:53.741Z",
+//       "updated_at": "2022-02-27T15:15:53.741Z",
+//       "docType": "Category"
+//   }
+// ]
+

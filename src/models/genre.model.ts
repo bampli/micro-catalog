@@ -1,7 +1,7 @@
 import {Entity, model, property} from '@loopback/repository';
 
 @model({settings: {strict: false}}) // metadata decorator
-export class Category extends Entity {
+export class Genre extends Entity {
   @property({
     type: 'string',
     id: true,
@@ -17,41 +17,31 @@ export class Category extends Entity {
   name: string;
 
   @property({
-    type: 'string',
-    required: false,
-    default: ''
-  })
-  description: string;
-
-  @property({
     type: 'boolean',
     required: false,
     default: true
   })
-  // eslint-disable-next-line @typescript-eslint/naming-convention
   is_active: boolean;
 
   @property({
     type: 'date',
     required: true,
   })
-  // eslint-disable-next-line @typescript-eslint/naming-convention
   created_at: string; // ISO 8601 YYYY-MM-DDT00:00:00
 
   @property({
     type: 'date',
     required: true,
   })
-  // eslint-disable-next-line @typescript-eslint/naming-convention
   updated_at: string; // ISO 8601 YYYY-MM-DDT00:00:00
 
-  constructor(data?: Partial<Category>) {
+  constructor(data?: Partial<Genre>) {
     super(data);
   }
 }
 
-export interface CategoryRelations {
+export interface GenreRelations {
   // describe navigational properties here
 }
 
-export type CategoryWithRelations = Category & CategoryRelations;
+export type GenreWithRelations = Genre & GenreRelations;
