@@ -1,6 +1,7 @@
-/* eslint-disable @typescript-eslint/naming-convention */
-const config = {
-  name: 'esv7',
+import datasource from './esv7.datasource.config.json';
+
+export default {
+  ...datasource,
   connector: 'esv6',
   index: 'catalog',
   version: 7,
@@ -30,6 +31,9 @@ const config = {
     "description": {
       "type": "text"
     },
+    "type": {
+      "type": "byte"
+    },
     "is_active": {
       "type": "boolean"
     },
@@ -41,5 +45,3 @@ const config = {
     }
   }
 };
-
-export default config;
