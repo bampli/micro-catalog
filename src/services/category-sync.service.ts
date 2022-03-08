@@ -1,9 +1,13 @@
 import {injectable, /* inject, */ BindingScope} from '@loopback/core';
 import {rabbitmqSubscribe} from '../decorators/rabbitmq-subscribe.decorator';
+import {repository} from "@loopback/repository";
+import {CategoryRepository} from "../repositories";
 
 @injectable({scope: BindingScope.TRANSIENT})
 export class CategorySyncService {
-  constructor(/* Add @inject to inject parameters */) { }
+  constructor(
+    @repository(CategoryRepository) private categoryRepo: CategoryRepository,
+  ) { }
 
   @rabbitmqSubscribe({
     exchange: 'amq.topic',
@@ -11,7 +15,16 @@ export class CategorySyncService {
     routingKey: 'model.category.*'
   })
   handler() {
-    //this.repository.create();
+    console.log(this.categoryRepo.entityClass, 'handler');
+  }
+
+  @rabbitmqSubscribe({
+    exchange: 'amq.topic',
+    queue: 'x',
+    routingKey: 'model.category1.*'
+  })
+  handler1() {
+    console.log(this.categoryRepo.entityClass, 'handler1');
   }
 
 }

@@ -1,4 +1,4 @@
-import {Context, inject} from "@loopback/context";
+import {Binding, Context, inject} from "@loopback/context";
 import {Application, ApplicationConfig, CoreBindings, Server} from "@loopback/core";
 import {repository} from "@loopback/repository";
 import {Channel, ConfirmChannel, Connection, Options, Replies} from "amqplib";
@@ -28,7 +28,7 @@ export class RabbitmqServer extends Context implements Server {
   ) {
     super(app);
     console.log("Config->", config);
-    //console.log(this.categoryRepo);
+    //console.log("Category->", this.categoryRepo);
   }
 
   async start(): Promise<void> {
@@ -45,13 +45,11 @@ export class RabbitmqServer extends Context implements Server {
     });
     await this.setupExchanges();
 
-    const service = this.getSync<CategorySyncService>('services.CategorySyncService');
-    const metadata = MetadataInspector.getAllMethodMetadata<RabbitmqSubscribeMetadata>(
-      RABBITMQ_SUBSCRIBE_DECORATOR,
-      service
-    );
-    console.log("Metadata->", metadata);
-    console.log("Handler->", (metadata as any)['handler'].exchange);
+    //console.log("Subscribers->", this.getSubscribers());
+    // @ts-ignore
+    console.log("Subscribers-0->", this.getSubscribers()[0][0]['method']());
+    // @ts-ignore
+    console.log("Subscribers-1->", this.getSubscribers()[0][1]['method']());
 
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     //this.boot();
@@ -66,6 +64,44 @@ export class RabbitmqServer extends Context implements Server {
         channel.assertExchange(exchange.name, exchange.type, exchange.options)
       )))
     })
+  }
+
+  private getSubscribers() {
+    const bindings: Array<Readonly<Binding>> = this.find('services.*');
+
+    //service1, service2, service3
+    //[methods that use the decorator], [], []
+    return bindings.map(
+      binding => {
+        const metadata = MetadataInspector.getAllMethodMetadata<RabbitmqSubscribeMetadata>(
+          RABBITMQ_SUBSCRIBE_DECORATOR,
+          binding.valueConstructor?.prototype
+        );
+        if (!metadata) {  //{methodname1: {}, methodname2: {}}
+          return [];
+        }
+        const methods = [];
+        for (const methodName in metadata) {
+          if (!Object.prototype.hasOwnProperty.call(metadata, methodName)) {
+            return;
+          }
+          const service = this.getSync(binding.key) as any;
+
+          methods.push({
+            method: service[methodName].bind(service),
+            metadata: metadata[methodName]
+          })
+        }
+        return methods;
+      }
+    );
+
+    // const service = this.getSync<CategorySyncService>('services.CategorySyncService');
+
+    // console.log("Metadata->", metadata);
+    // // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // console.log("Handler->", (metadata as any)['handler'].exchange);
+
   }
 
   async boot() {
@@ -148,3 +184,21 @@ export class RabbitmqServer extends Context implements Server {
 //   - {"id": "uuid2", "name": "novo nome 2", "created_at": "2020-01-01T00:00","updated_at": "2020-01-01T00:01"}
 
 
+// Services-> [
+//   Binding {
+//     _events: [Object: null prototype] { changed: [Function (anonymous)] },
+//     _eventsCount: 1,
+//     _maxListeners: undefined,
+//     isLocked: false,
+//     tagMap: {
+//       type: 'service',
+//       service: 'service',
+//       serviceInterface: [class CategorySyncService]
+//     },
+//     key: 'services.CategorySyncService',
+//     _source: { type: 'Class', value: [class CategorySyncService] },
+//     _getValue: [Function (anonymous)],
+//     _scope: 'Transient',
+//     [Symbol(kCapture)]: false
+//   }
+// ]
