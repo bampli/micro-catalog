@@ -2,6 +2,8 @@
 
 Fc2 micro-catalog api backend
 
+![Screenshot from 2022-02-28 15-39-41](https://user-images.githubusercontent.com/86032/156039490-7ec5fa96-5a6a-49e1-a53a-c06a6b551de1.png)
+
 ## Setup
 
 Generated with latest LTS version.
@@ -25,8 +27,6 @@ chmod 777 .docker/elasticdata
 ```
 
 ## Templates
-
-![Screenshot from 2022-02-28 15-39-41](https://user-images.githubusercontent.com/86032/156039490-7ec5fa96-5a6a-49e1-a53a-c06a6b551de1.png)
 
 ```
 docker logs -f --tail 100 micro-catalog-app
