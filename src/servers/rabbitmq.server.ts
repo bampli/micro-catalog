@@ -118,9 +118,11 @@ export class RabbitmqServer extends Context implements Server {
       }, [])
   }
 
-  private async consume(
-    {channel, queue, method}: {channel: ConfirmChannel, queue: string, method: Function}
-  ) {
+  private async consume({channel, queue, method}: {
+    channel: ConfirmChannel,
+    queue: string,
+    method: Function
+  }) {
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     await channel.consume(queue, async (message) => {
       try {
