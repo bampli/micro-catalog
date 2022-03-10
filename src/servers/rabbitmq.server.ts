@@ -1,17 +1,24 @@
 import {Binding, Context, inject} from "@loopback/context";
 import {Application, CoreBindings, Server} from "@loopback/core";
 import {repository} from "@loopback/repository";
-import {Channel, ConfirmChannel, Options} from "amqplib";
+import {Channel, ConfirmChannel, Message, Options} from "amqplib";
 import {RabbitmqBindings} from '../keys';
 import {CategoryRepository} from "../repositories";
 import {AmqpConnectionManager, AmqpConnectionManagerOptions, ChannelWrapper, connect} from 'amqp-connection-manager';
 import {MetadataInspector} from '@loopback/metadata';
 import {RabbitmqSubscribeMetadata, RABBITMQ_SUBSCRIBE_DECORATOR} from '../decorators/rabbitmq-subscribe.decorator';
 
+export enum ResponseEnum {
+  ACK = 0,
+  REQUEUE = 1,
+  NACK = 2
+}
+
 export interface RabbitmqConfig {
   uri: string;
   connOptions?: AmqpConnectionManagerOptions;
   exchanges?: {name: string, type: string, options?: Options.AssertExchange}[];
+  defaultHandlerError?: ResponseEnum;
 }
 export class RabbitmqServer extends Context implements Server {
   private _listening: boolean;
@@ -118,9 +125,11 @@ export class RabbitmqServer extends Context implements Server {
       }, [])
   }
 
-  private async consume(
-    {channel, queue, method}: {channel: ConfirmChannel, queue: string, method: Function}
-  ) {
+  private async consume({channel, queue, method}: {
+    channel: ConfirmChannel,
+    queue: string,
+    method: Function
+  }) {
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     await channel.consume(queue, async (message) => {
       try {
@@ -137,14 +146,31 @@ export class RabbitmqServer extends Context implements Server {
             data = null;
           }
           console.log("Message->", data);
-          await method({data, message, channel});
-          channel.ack(message);
+          const responseType = await method({data, message, channel});
+          this.dispatchResponse(channel, message, responseType);
         }
       } catch (e) {
         console.error(e);
-        //politica respostas
+        if (!message) {
+          return;
+        }
+        this.dispatchResponse(channel, message, this.config?.defaultHandlerError);
       }
     });
+  }
+
+  private dispatchResponse(channel: Channel, message: Message, responseType?: ResponseEnum) {
+    switch (responseType) {
+      case ResponseEnum.REQUEUE:
+        channel.nack(message, false, true);
+        break;
+      case ResponseEnum.NACK:
+        channel.nack(message, false, false);
+        break;
+      case ResponseEnum.ACK:
+      default:
+        channel.ack(message);
+    }
   }
 
   async stop(): Promise<void> {
