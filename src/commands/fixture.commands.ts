@@ -4,6 +4,8 @@ import {MicroCatalogApplication} from '../application';
 import * as config from '../../config';
 import {Esv7DataSource} from '../datasources';
 import {Client} from 'es7';
+import fixtures from '../fixtures';
+import {DefaultCrudRepository} from '@loopback/repository';
 
 export class FixtureCommand {
   static command = 'fixtures';
@@ -14,8 +16,14 @@ export class FixtureCommand {
   async run() {
     console.log(chalk.green('Fixture data'));
     await this.bootApp();
-    console.log(chalk.green('Delete all documents'))
+    console.log(chalk.green('Delete all documents'));
     await this.deleteAllDocuments();
+
+    for (const fixture of fixtures) {
+      const repository = this.getRepository<DefaultCrudRepository<any, any>>(fixture.model);
+      await repository.create(fixture.fields);
+    }
+    console.log(chalk.green('Documents generated'))
   };
 
   private async bootApp() {
@@ -36,5 +44,9 @@ export class FixtureCommand {
       }
 
     })
+  }
+
+  private getRepository<T>(modelName: string): T {
+    return this.app.getSync(`repositories.${modelName}Repository`)
   }
 }
