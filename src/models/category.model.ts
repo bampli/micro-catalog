@@ -55,3 +55,33 @@ export interface CategoryRelations {
 }
 
 export type CategoryWithRelations = Category & CategoryRelations;
+
+// #powered by ajv
+// import {getModelSchemaRef} from '@loopback/rest';
+// const schema = getModelSchemaRef(Category, {
+//   title: 'NewCategory',
+//   partial: true
+// })
+// console.dir(schema, {depth: 8});
+
+// {
+//   '$ref': '#/components/schemas/NewCategory',
+//   definitions: {
+//     NewCategory: {
+//       title: 'NewCategory',
+//       type: 'object',
+//       description: "(tsType: Category, schemaOptions: { title: 'NewCategory' })",
+//       properties: {
+//         id: { type: 'string' },
+//         name: { type: 'string' },
+//         description: { type: 'string' },
+//         is_active: { type: 'boolean' },
+//         created_at: { type: 'string', format: 'date-time' },
+//         updated_at: { type: 'string', format: 'date-time' }
+//       },
+//       required: [ 'id', 'name', 'created_at', 'updated_at' ],
+//       additionalProperties: true,
+//       'x-typescript-type': 'Category'
+//     }
+//   }
+// }

@@ -31,6 +31,8 @@ chmod 777 .docker/elasticdata
 ```
 docker logs -f --tail 100 micro-catalog-app
 
+npm run clean
+
 lb4 model
 lb4 datasource
 
@@ -54,10 +56,29 @@ lb4 service
 ? Service name: CastMemberSync
    create src/services/cast-member-sync.service.ts
    update src/services/index.ts
----------------------------
 
 Service CastMemberSync was/were created in src/services
 
+
+---------------------------
+lb4 controller
+
+? Controller class name: Category
+Controller Category will be created in src/controllers/category.controller.ts
+
+? What kind of controller would you like to generate? REST Controller with CRUD functions
+? What is the name of the model to use with this CRUD repository? Category
+? What is the name of your CRUD repository? CategoryRepository
+? What is the name of ID property? id
+? What is the type of your ID? string
+? Is the id omitted when creating a new instance? No
+? What is the base HTTP path name of the CRUD operations? /categories
+   create src/controllers/category.controller.ts
+   update src/controllers/index.ts
+
+Controller Category was/were created in src/controllers
+
+---------------------------
 export class RabbitmqServer extends Context implements Server {}
 
 # debug with loopback cli

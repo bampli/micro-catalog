@@ -44,5 +44,6 @@ export class MicroCatalogApplication extends BootMixin(
     };
 
     this.server(RabbitmqServer);
+    //this.component(CrudRestComponent);
   }
 }
