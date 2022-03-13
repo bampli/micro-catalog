@@ -6,8 +6,10 @@ import {RestExplorerBindings} from '@loopback/rest-explorer';
 import {ServiceMixin} from '@loopback/service-proxy';
 import path from 'path';
 import {RestExplorerComponent} from './components';
+import {Category} from './models';
 import {MySequence} from './sequence';
 import {RabbitmqServer} from './servers';
+import {ValidatorService} from './services/validator.service';
 
 export {ApplicationConfig};
 
@@ -45,5 +47,20 @@ export class MicroCatalogApplication extends BootMixin(
 
     this.server(RabbitmqServer);
     //this.component(CrudRestComponent);
+  }
+
+  async boot(): Promise<void> {
+    await super.boot();
+
+    const validator = this.getSync<ValidatorService>('services.ValidatorService');
+
+    try {
+      await validator.validate({
+        data: {},
+        entityClass: Category
+      })
+    } catch (e) {
+      console.dir(e, {depth: 8})
+    }
   }
 }
