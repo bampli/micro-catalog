@@ -1,10 +1,10 @@
 import {bind, /* inject, */ BindingScope, inject} from '@loopback/core';
-import {Entity, repository} from "@loopback/repository";
+import {constrainDataObject, repository} from "@loopback/repository";
 import {CategoryRepository} from "../repositories";
 import {AjvFactory, getModelSchemaRef, RestBindings, validateRequestBody} from '@loopback/rest';
 
 interface ValidateOptions<T> {
-  data: any;
+  data: object;
   entityClass: Function & {prototype: T};
 }
 @bind({scope: BindingScope.SINGLETON})
@@ -13,7 +13,7 @@ export class ValidatorService {
   cache = new Map();
 
   constructor(
-    @repository(CategoryRepository) private repo: CategoryRepository,
+    //@repository(CategoryRepository) private repo: CategoryRepository,
     @inject(RestBindings.AJV_FACTORY) private ajvFactory: AjvFactory
   ) { }
 
@@ -29,7 +29,37 @@ export class ValidatorService {
     if (!this.cache.has(schemaName)) {
       this.cache.set(schemaName, modelSchema.definitions[schemaName]);
     }
-    // [
+
+    const globalSchemas = Array.from(this.cache).reduce<any>(
+      (obj, [key, value]) => {
+        obj[key] = value;
+        return obj
+      },
+      {}
+    );
+    console.log("VALIDATE");
+    console.dir(globalSchemas, {depth: 8});
+    console.log(schemaName, schemaRef);
+    console.log(this.ajvFactory);
+
+    await validateRequestBody(
+      {value: data, schema: schemaRef},
+      {required: true, content: {}},
+      globalSchemas,
+      {
+        ajvFactory: this.ajvFactory,
+        strict: false,
+        strictSchema: false,
+        strictNumbers: false,
+        strictTypes: false,
+        strictTuples: false,
+      }
+    );
+  }
+}
+
+// globalSchemas
+// [
     //   [key, value],
     //   [key, value],
     //   [key, value],
@@ -41,25 +71,6 @@ export class ValidatorService {
     //   key: value,
     // }
     // {Category: schema-definitions, Genre: schema-definitions, ...}
-    const globalSchemas = Array.from(this.cache).reduce<any>(
-      (obj, [key, value]) => {
-        obj[key] = value;
-        return obj
-      },
-      {}
-    );
-    console.dir(globalSchemas, {depth: 8});
-
-    await validateRequestBody(
-      {value: data, schema: schemaRef},
-      {required: true, content: {}},
-      globalSchemas,
-      {
-        ajvFactory: this.ajvFactory
-      }
-    );
-  }
-}
 
 // {
 //   '$ref': '#/components/schemas/NewCategory',

@@ -34,6 +34,7 @@ export class MicroCatalogApplication extends BootMixin(
     });
     this.component(RestExplorerComponent);
     this.component(ValidatorsComponent);
+
     this.projectRoot = __dirname;
     // Customize @loopback/boot Booter Conventions here
     this.bootOptions = {
@@ -55,13 +56,19 @@ export class MicroCatalogApplication extends BootMixin(
 
     const validator = this.getSync<ValidatorService>('services.ValidatorService');
 
+    console.log('BOOOOOOOOOOOOOOT');
     try {
       await validator.validate({
-        data: {},
-        entityClass: Category
+        data: {
+          id: '12',
+          name: 'teste',
+          created_at: "2020-01-01T00:00:00.000Z",
+          updated_at: "2020-01-01T00:00:00.000Z"
+        },
+        entityClass: Category,
       })
     } catch (e) {
-      console.dir(e, {depth: 8})
+      console.dir(e, {depth: 8});
     }
   }
 }
