@@ -49,6 +49,7 @@ export class MicroCatalogApplication extends BootMixin(
     //this.component(CrudRestComponent);
   }
 
+  // Intercept boot & test validator services, installed after super.boot
   async boot(): Promise<void> {
     await super.boot();
 
