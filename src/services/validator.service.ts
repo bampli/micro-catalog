@@ -13,7 +13,7 @@ export class ValidatorService {
   cache = new Map();
 
   constructor(
-    //@repository(CategoryRepository) private repo: CategoryRepository,
+    @repository(CategoryRepository) private repo: CategoryRepository,
     @inject(RestBindings.AJV_FACTORY) private ajvFactory: AjvFactory
   ) { }
 
