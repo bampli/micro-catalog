@@ -53,6 +53,8 @@ export class ValidatorService {
         strictNumbers: false,
         strictTypes: false,
         strictTuples: false,
+        ajvKeywords: ['range'],
+        keywords: ['exists']
       }
     );
   }
