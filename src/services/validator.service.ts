@@ -1,10 +1,10 @@
 import {bind, /* inject, */ BindingScope, inject} from '@loopback/core';
-import {constrainDataObject, repository} from "@loopback/repository";
+import {repository} from "@loopback/repository";
 import {CategoryRepository} from "../repositories";
 import {AjvFactory, getModelSchemaRef, RestBindings, validateRequestBody} from '@loopback/rest';
 
 interface ValidateOptions<T> {
-  data: object;
+  data: any;
   entityClass: Function & {prototype: T};
 }
 @bind({scope: BindingScope.SINGLETON})
