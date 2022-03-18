@@ -3,7 +3,7 @@ import {DefaultCrudRepository} from '@loopback/repository';
 import {RestTags} from '@loopback/rest';
 import {ApplicationWithServices} from '@loopback/service-proxy';
 import {difference} from 'lodash';
-import ValidationError from 'ajv';
+import ValidationError from 'ajv/dist/runtime/validation_error';
 
 export class ValidatorsComponent implements Component {
   bindings: Array<Binding> = [];
@@ -19,7 +19,7 @@ export class ValidatorsComponent implements Component {
       Binding
         .bind('ajv.keywords.exists')
         .to({
-          name: 'exists',
+          keyword: 'exists',
           validate: async ([model, field]: Array<any>, value: any) => {
             const values = Array.isArray(value) ? value : [value];
             const repository = this.app.getSync<DefaultCrudRepository<any, any>>(`repositories.${model}Repository`);
@@ -27,7 +27,7 @@ export class ValidatorsComponent implements Component {
               where: {
                 or: values.map(v => ({[field]: v}))
               }
-            })
+            });
             if (rows.length !== values.length) {
               const valuesNotExist = difference(values, rows.map(r => r[field]));
               const errors = valuesNotExist.map(

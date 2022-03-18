@@ -37,24 +37,19 @@ export class ValidatorService {
       },
       {}
     );
-    console.log("VALIDATE");
-    console.dir(globalSchemas, {depth: 8});
-    console.log(schemaName, schemaRef);
-    console.log(this.ajvFactory);
+    // console.log("MODELSCHEMA");
+    // console.dir(modelSchema, {depth: 8});
+    // console.log("SCHEMANAME", schemaName);
+    // console.log("SCHEMAREF", schemaRef);
+    // console.log("GLOBALSCHEMAS");
+    // console.dir(globalSchemas, {depth: 8});
 
     await validateRequestBody(
       {value: data, schema: schemaRef},
       {required: true, content: {}},
       globalSchemas,
       {
-        ajvFactory: this.ajvFactory,
-        strict: false,
-        strictSchema: false,
-        strictNumbers: false,
-        strictTypes: false,
-        strictTuples: false,
-        ajvKeywords: ['range'],
-        keywords: ['exists']
+        ajvFactory: this.ajvFactory
       }
     );
   }
