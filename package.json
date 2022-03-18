@@ -34,7 +34,8 @@
     "prestart": "npm run rebuild",
     "start": "node -r source-map-support/register .",
     "clean": "lb-clean dist *.tsbuildinfo .eslintcache",
-    "rebuild": "npm run clean && npm run build"
+    "rebuild": "npm run clean && npm run build",
+    "console": "node dist/console.js"
   },
   "repository": {
     "type": "git",
@@ -55,9 +56,9 @@
     "@loopback/rest": "^11.1.0",
     "@loopback/rest-explorer": "^4.1.0",
     "@loopback/service-proxy": "^4.1.0",
-    "@types/amqp-connection-manager": "^2.0.12",
-    "@types/amqplib": "^0.8.2",
-    "@types/lodash": "^4.14.179",
+    "ajv": "^8.10.0",
+    "ajv-formats": "^2.1.1",
+    "ajv-keywords": "^5.1.0",
     "amqp-connection-manager": "^4.1.1",
     "amqplib": "^0.8.0",
     "debug": "^4.3.3",
@@ -70,6 +71,9 @@
     "@loopback/build": "^8.1.0",
     "@loopback/eslint-config": "^12.0.2",
     "@loopback/testlab": "^4.1.0",
+    "@types/amqp-connection-manager": "^2.0.12",
+    "@types/amqplib": "^0.8.2",
+    "@types/lodash": "^4.14.179",
     "@types/node": "^12.20.43",
     "eslint": "^8.8.0",
     "source-map-support": "^0.5.21",
