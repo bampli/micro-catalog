@@ -54,21 +54,21 @@ export class MicroCatalogApplication extends BootMixin(
   async boot(): Promise<void> {
     await super.boot();
 
-    const validator = this.getSync<ValidatorService>('services.ValidatorService');
+    // const validator = this.getSync<ValidatorService>('services.ValidatorService');
 
-    console.log('BOOOOOOOOOOOOOOT');
-    try {
-      await validator.validate({
-        data: {
-          id: '12',
-          name: 'teste',
-          created_at: "2020-01-01T00:00:00.000Z",
-          updated_at: "2020-01-01T00:00:00.000Z"
-        },
-        entityClass: Category,
-      })
-    } catch (e) {
-      console.dir(e, {depth: 8});
-    }
+    // console.log('BOOOOOOOOOOOOOOT');
+    // try {
+    //   await validator.validate({
+    //     data: {
+    //       id: '12',
+    //       name: 'teste',
+    //       created_at: "2020-01-01T00:00:00.000Z",
+    //       updated_at: "2020-01-01T00:00:00.000Z"
+    //     },
+    //     entityClass: Category,
+    //   })
+    // } catch (e) {
+    //   console.dir(e, {depth: 8});
+    // }
   }
 }
