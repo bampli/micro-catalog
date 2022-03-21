@@ -1,5 +1,5 @@
 import {Entity, model, property} from '@loopback/repository';
-import {getModelSchemaRef} from '@loopback/rest';
+//import {getModelSchemaRef} from '@loopback/rest';
 import {SmallCategory} from '.';
 
 @model({settings: {strict: false}}) // metadata decorator
