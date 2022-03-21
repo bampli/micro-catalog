@@ -39,7 +39,23 @@ export class ValidatorsComponent implements Component {
           },
           async: true
         })
-        .tag(RestTags.AJV_KEYWORD)
+        .tag(RestTags.AJV_KEYWORD),
+
+      // another rule
+      // Binding
+      //   .bind('ajv.keywords.other')
+      //   .to({
+      //     keyword: 'other',
+      //     validate: async () => {
+      //       const errors = true;
+      //       if (errors) {
+      //         throw new ValidationError(errors as any);
+      //       }
+      //       return true;
+      //     },
+      //     async: true
+      //   })
+      //   .tag(RestTags.AJV_KEYWORD),
     ];
   }
 
