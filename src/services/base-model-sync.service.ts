@@ -165,3 +165,39 @@ export abstract class BaseModelSyncService {
 //     ]
 //   }
 // }
+
+// Kibana
+// POST /catalog/_update_by_query
+// {
+//   "query": {
+//     "term": {
+//       "_id": "f97284b0-40b8-4195-bff9-b3e9a0d96792"
+//     }
+//   },
+//   "script": {
+//     "source": """
+//         if( !ctx._source.containsKey('categories') ){
+//           ctx._source['categories'] = []
+//         }
+//         for(item in params['categories']){
+//           if( ctx._source['categories'].find( i -> i.id == item.id ) == null){
+//             ctx._source['categories'].add(item)
+//           }
+//         }
+//       """,
+//     "params": {
+//       "categories": [
+//         {
+//           "id": "1-cat",
+//           "name": "Filme",
+//           "is_active": true
+//         },
+//         {
+//           "id": "2",
+//           "name": "xxx-2",
+//           "is_active": true
+//         }
+//       ]
+//     }
+//   }
+// }
