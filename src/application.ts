@@ -54,6 +54,14 @@ export class MicroCatalogApplication extends BootMixin(
   async boot(): Promise<void> {
     await super.boot();
 
+    // const genreRepo = this.getSync('repositories.GenreRepository');
+    // //@ts-ignorets_
+    // genreRepo.updateCategories({
+    //   "id": "1d644412-0d3a-4d30-8757-29ca50a2047",
+    //   "name": "MediumTurquoise2",
+    //   "is_active": true
+    // });
+
     // const validator = this.getSync<ValidatorService>('services.ValidatorService');
 
     // console.log('BOOOOOOOOOOOOOOT');

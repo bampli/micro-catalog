@@ -42,7 +42,51 @@ export class GenreRepository extends DefaultCrudRepository<
         }
       }
     };
+    const db: Client = this.dataSource.connector?.db;
 
+    await db.update_by_query(document);
+  }
+
+  async updateCategories(data: object[]) {
+    const document = {
+      index: this.dataSource.settings.index,
+      refresh: true,
+      body: {
+        query: {
+          bool: {
+            must: [
+              {
+                nested: {
+                  path: "categories",
+                  query: {
+                    exists: {
+                      field: "categories"
+                    }
+                  }
+                }
+              },
+              {
+                nested: {
+                  path: "categories",
+                  query: {
+                    term: {"categories.id": "047dfb69-73e6-4685-aa63-4a963e3502fb"}
+                  }
+                }
+              }
+            ]
+          }
+        },
+        script: {
+          source: `
+              ctx._source['categories'].removeIf(i -> i.id == params['category']['id']);
+              ctx._source['categories'].add(params['category'])
+            `,
+          params: {
+            category: data
+          }
+        }
+      }
+    };
     const db: Client = this.dataSource.connector?.db;
 
     await db.update_by_query(document);
