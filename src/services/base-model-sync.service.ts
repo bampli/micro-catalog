@@ -7,7 +7,16 @@ export interface SyncOptions {
   repo: DefaultCrudRepository<any, any>;
   data: any;
   message: Message;
-}
+};
+
+export interface SyncRelationOptions {
+  id: string;
+  relation: string;
+  relationIds: string[];
+  repo: DefaultCrudRepository<any, any>;
+  repoRelation: DefaultCrudRepository<any, any>;
+};
+
 export abstract class BaseModelSyncService {
 
   constructor(
@@ -60,21 +69,14 @@ export abstract class BaseModelSyncService {
     return exists ? repo.updateById(id, entity) : repo.create(entity);
   }
 
-  async syncRelation({id, relation, relationIds, repo, repoRelation, message}: {
-    id: string;
-    relation: string;
-    relationIds: string[];
-    repo: DefaultCrudRepository<any, any>;
-    repoRelation: DefaultCrudRepository<any, any>;
-    message: Message;
-  }) {
-    const fieldsRelation = Object.keys(
-      repo.modelClass.definition.properties[relation]
-        .jsonSchema.items.properties
-    ).reduce((obj: any, field: string) => {
-      obj[field] = true;
-      return obj;
-    }, {});
+  async syncRelation({
+    id,
+    relation,
+    relationIds,
+    repo,
+    repoRelation
+  }: SyncRelationOptions) {
+    const fieldsRelation = this.extractFieldsRelation(repo, relation);
 
     const collection = await repoRelation.find({
       where: {
@@ -96,6 +98,19 @@ export abstract class BaseModelSyncService {
     }
 
     await repo.updateById(id, {[relation]: collection});
+  }
+
+  protected extractFieldsRelation(
+    repo: DefaultCrudRepository<any, any>,
+    relation: string
+  ) {
+    return Object.keys(
+      repo.modelClass.definition.properties[relation]
+        .jsonSchema.items.properties
+    ).reduce((obj: any, field: string) => {
+      obj[field] = true;
+      return obj;
+    }, {})
   }
 }
 
