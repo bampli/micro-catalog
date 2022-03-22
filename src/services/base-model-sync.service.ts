@@ -1,4 +1,4 @@
-import {DefaultCrudRepository} from "@loopback/repository";
+import {DefaultCrudRepository, EntityNotFoundError} from "@loopback/repository";
 import {Message} from 'amqplib';
 import {pick} from 'lodash';
 import {ValidatorService} from './validator.service';
@@ -60,17 +60,93 @@ export abstract class BaseModelSyncService {
     return exists ? repo.updateById(id, entity) : repo.create(entity);
   }
 
-  async syncRelation({id, relationIds, repoRelation, message}: {
+  async syncRelation({id, relation, relationIds, repo, repoRelation, message}: {
     id: string;
+    relation: string;
     relationIds: string[];
+    repo: DefaultCrudRepository<any, any>;
     repoRelation: DefaultCrudRepository<any, any>;
     message: Message;
   }) {
+    const fieldsRelation = Object.keys(
+      repo.modelClass.definition.properties[relation]
+        .jsonSchema.items.properties
+    ).reduce((obj: any, field: string) => {
+      obj[field] = true;
+      return obj;
+    }, {});
+
     const collection = await repoRelation.find({
       where: {
         or: relationIds.map(idRelation => ({id: idRelation})) // [{id: 'id1'}, {id: 'id2'}]
-      }
+      },
+      fields: fieldsRelation, // select only relation fields
     });
-    console.log("COLLECTION", collection);
+
+    // console.log("FIELDSRELATION", fieldsRelation);
+    // console.log("COLLECTION", collection);
+
+    if (!collection.length) {
+      const error = new EntityNotFoundError(
+        repoRelation.entityClass,
+        relationIds
+      );
+      error.name = 'EntityNotFound';
+      throw error;
+    }
+
+    await repo.updateById(id, {[relation]: collection});
   }
 }
+
+// repo.modelClass.definition.properties[relation]
+// {
+//   type: [Function: Object],
+//   jsonSchema: {
+//     type: 'array',
+//     items: {
+//       type: 'object',
+//       properties: {
+//         id: { type: 'string' },
+//         name: { type: 'string' },
+//         is_active: { type: 'boolean' }
+//       }
+//     },
+//     uniqueItems: true
+//   }
+// }
+
+// FIELDSRELATION { id: true, name: true, is_active: true }
+// COLLECTION [
+//   Category {
+//     id: '047dfb69-73e6-4685-aa63-4a963e3502fb',
+//     name: 'Lavenderaaaa 345',
+//     description: undefined,
+//     is_active: true,
+//     created_at: undefined,
+//     updated_at: undefined
+//   }
+// ]
+
+// ElasticSearch
+// {
+//   "_index" : "catalog",
+//   "_type" : "_doc",
+//   "_id" : "f97284b0-40b8-4195-bff9-b3e9a0d96792",
+//   "_score" : 1.0,
+//   "_source" : {
+//     "is_active" : true,
+//     "updated_at" : "2022-03-22T16:28:02.000Z",
+//     "docType" : "Genre",
+//     "name" : "novo genero",
+//     "created_at" : "2022-03-22T16:28:02.000Z",
+//     "id" : "f97284b0-40b8-4195-bff9-b3e9a0d96792",
+//     "categories" : [
+//       {
+//         "is_active" : true,
+//         "name" : "Lavenderaaaa 345",
+//         "id" : "047dfb69-73e6-4685-aa63-4a963e3502fb"
+//       }
+//     ]
+//   }
+// }
