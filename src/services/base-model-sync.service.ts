@@ -97,7 +97,9 @@ export abstract class BaseModelSyncService {
       throw error;
     }
 
-    await repo.updateById(id, {[relation]: collection});
+    await (repo as any).attachCategories(id, collection);
+
+    //await repo.updateById(id, {[relation]: collection});
   }
 
   protected extractFieldsRelation(
