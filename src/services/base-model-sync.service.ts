@@ -71,6 +71,6 @@ export abstract class BaseModelSyncService {
         or: relationIds.map(idRelation => ({id: idRelation})) // [{id: 'id1'}, {id: 'id2'}]
       }
     });
-    console.log(collection);
+    console.log("COLLECTION", collection);
   }
 }
