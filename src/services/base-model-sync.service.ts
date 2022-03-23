@@ -112,7 +112,7 @@ export abstract class BaseModelSyncService {
     ).reduce((obj: any, field: string) => {
       obj[field] = true;
       return obj;
-    }, {})
+    }, {});
   }
 }
 

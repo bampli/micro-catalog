@@ -79,6 +79,15 @@ Controller Category will be created in src/controllers/category.controller.ts
 Controller Category was/were created in src/controllers
 
 ---------------------------
+lb4 observer UpdateCategoryRelation
+
+? Observer group:
+   create src/observers/update-category-relation.observer.ts
+   update src/observers/index.ts
+
+Observer UpdateCategoryRelation was/were created in src/observers
+
+---------------------------
 export class RabbitmqServer extends Context implements Server {}
 
 # debug with loopback cli
