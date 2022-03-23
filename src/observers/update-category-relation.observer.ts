@@ -4,7 +4,6 @@ import {
   LifeCycleObserver, // The interface
 } from '@loopback/core';
 import {repository} from '@loopback/repository';
-import {Category} from '../models';
 import {CategoryRepository, GenreRepository} from '../repositories';
 
 /**
@@ -37,7 +36,7 @@ export class UpdateCategoryRelationObserver implements LifeCycleObserver {
         if (isNewInstance) {
           return;
         }
-        await this.genreRepo.updateCategories(data);
+        await this.genreRepo.updateRelation('categories', data);
       })
   }
 

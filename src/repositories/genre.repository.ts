@@ -2,8 +2,8 @@ import {inject} from '@loopback/core';
 import {BaseRepository} from './base.repository';
 import {Esv7DataSource} from '../datasources';
 import {Genre, GenreRelations} from '../models';
-import {Client} from 'es7';
-import {pick} from 'lodash';
+// import {Client} from 'es7';
+// import {pick} from 'lodash';
 
 export class GenreRepository extends BaseRepository<
   Genre,
@@ -48,55 +48,55 @@ export class GenreRepository extends BaseRepository<
   //   await db.update_by_query(document);
   // }
 
-  async updateCategories(data: object[]) {
-    const fields = Object.keys(
-      this.modelClass.definition.properties['categories']
-        .jsonSchema.items.properties
-    );
+  // async updateCategories(data: object[]) {
+  //   const fields = Object.keys(
+  //     this.modelClass.definition.properties['categories']
+  //       .jsonSchema.items.properties
+  //   );
 
-    const category = pick(data, fields);
+  //   const category = pick(data, fields);
 
-    const document = {
-      index: this.dataSource.settings.index,
-      refresh: true,
-      body: {
-        query: {
-          bool: {
-            must: [
-              {
-                nested: {
-                  path: "categories",
-                  query: {
-                    exists: {
-                      field: "categories"
-                    }
-                  }
-                }
-              },
-              {
-                nested: {
-                  path: "categories",
-                  query: {
-                    term: {"categories.id": '1-cat'}
-                  }
-                }
-              }
-            ]
-          }
-        },
-        script: {
-          source: `
-              ctx._source['categories'].removeIf(i -> i.id == params['category']['id']);
-              ctx._source['categories'].add(params['category'])
-            `,
-          params: {
-            category
-          }
-        }
-      }
-    };
-    const db: Client = this.dataSource.connector?.db;
+  //   const document = {
+  //     index: this.dataSource.settings.index,
+  //     refresh: true,
+  //     body: {
+  //       query: {
+  //         bool: {
+  //           must: [
+  //             {
+  //               nested: {
+  //                 path: "categories",
+  //                 query: {
+  //                   exists: {
+  //                     field: "categories"
+  //                   }
+  //                 }
+  //               }
+  //             },
+  //             {
+  //               nested: {
+  //                 path: "categories",
+  //                 query: {
+  //                   term: {"categories.id": '1-cat'}
+  //                 }
+  //               }
+  //             }
+  //           ]
+  //         }
+  //       },
+  //       script: {
+  //         source: `
+  //             ctx._source['categories'].removeIf(i -> i.id == params['category']['id']);
+  //             ctx._source['categories'].add(params['category'])
+  //           `,
+  //         params: {
+  //           category
+  //         }
+  //       }
+  //     }
+  //   };
+  //   const db: Client = this.dataSource.connector?.db;
 
-    await db.update_by_query(document);
-  }
+  //   await db.update_by_query(document);
+  // }
 }
