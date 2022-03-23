@@ -56,16 +56,16 @@ export class MicroCatalogApplication extends BootMixin(
   async boot(): Promise<void> {
     await super.boot();
 
-    const categoryRepo = this.getSync('repositories.CategoryRepository');
-    // @ts-ignore
-    const category: Category[] = await categoryRepo.find({where: {id: '1-cat'}});
+    // const categoryRepo = this.getSync('repositories.CategoryRepository');
+    // // @ts-ignore
+    // const category: Category[] = await categoryRepo.find({where: {id: '1-cat'}});
 
-    console.log("CATEGORY", category, category[0].id, category[0].name);
-    // @ts-ignore
-    categoryRepo.updateById(category[0].id, {
-      ...category[0],
-      name: 'ok2 loopback'
-    });
+    // console.log("CATEGORY", category, category[0].id, category[0].name);
+    // // @ts-ignore
+    // categoryRepo.updateById(category[0].id, {
+    //   ...category[0],
+    //   name: 'ok2 loopback'
+    // });
 
     // const genreRepo = this.getSync('repositories.GenreRepository');
     // //@ts-ignorets_
