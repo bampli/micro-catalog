@@ -49,6 +49,22 @@ export class RabbitmqServer extends Context implements Server {
       console.log(`Failed connection to RabbitMQ channel - name: ${name} | error: ${err.message}`);
     });
     await this.setupExchanges();
+
+    // create preliminary DLQ - start here
+    await this.channelManager.addSetup(async (channel: ConfirmChannel) => {
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      const assertExchange = await channel.assertExchange('dlx.amq.topic', 'topic');
+      const assertQueue = await channel.assertQueue(
+        'dlx.sync-videos',
+        {
+          deadLetterExchange: 'amq.topic',
+          messageTtl: 10000
+        }
+      );
+      await channel.bindQueue(assertQueue.queue, assertExchange.exchange, 'model.category.*');
+    });
+    // create preliminary DLQ - end here
+
     await this.bindSubscribers();
   }
 
@@ -58,7 +74,11 @@ export class RabbitmqServer extends Context implements Server {
         return;
       }
       await Promise.all(this.config.exchanges.map((exchange) => (
-        channel.assertExchange(exchange.name, exchange.type, exchange.options)
+        channel.assertExchange(
+          exchange.name,
+          exchange.type,
+          exchange.options
+        )
       )))
     })
   }
@@ -77,7 +97,9 @@ export class RabbitmqServer extends Context implements Server {
           const routingKeys = Array.isArray(routingKey) ? routingKey : [routingKey];
 
           await Promise.all(
-            routingKeys.map((x) => channel.bindQueue(assertQueue.queue, exchange, x))
+            routingKeys.map((x) =>
+              channel.bindQueue(assertQueue.queue, exchange, x),
+            )
           );
           await this.consume({
             channel,
