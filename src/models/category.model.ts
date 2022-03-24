@@ -1,5 +1,11 @@
 import {Entity, model, property} from '@loopback/repository';
 
+export interface SmallCategory {
+  id: string;
+  name: string;
+  is_active: boolean;
+}
+
 @model({settings: {strict: false}}) // metadata decorator
 export class Category extends Entity {
   @property({
@@ -7,9 +13,9 @@ export class Category extends Entity {
     id: true,
     generated: false,
     required: true,
-    jsonSchema: {
-      exists: ['Category', 'id']
-    }
+    // jsonSchema: {
+    //   exists: ['Category', 'id']
+    // }
   })
   id: string;
 
@@ -26,7 +32,10 @@ export class Category extends Entity {
   @property({
     type: 'string',
     required: false,
-    default: ''
+    jsonSchema: {
+      nullable: true
+    },
+    default: null
   })
   description: string;
 

@@ -5,11 +5,9 @@ import {RestComponent, RestServer} from '@loopback/rest';
 import {RestExplorerBindings} from '@loopback/rest-explorer';
 import {ServiceMixin} from '@loopback/service-proxy';
 import path from 'path';
-import {RestExplorerComponent, ValidatorsComponent} from './components';
-import {Category} from './models';
+import {EntityComponent, RestExplorerComponent, ValidatorsComponent} from './components';
 import {MySequence} from './sequence';
 import {RabbitmqServer} from './servers';
-import {ValidatorService} from './services/validator.service';
 
 export {ApplicationConfig};
 
@@ -34,6 +32,7 @@ export class MicroCatalogApplication extends BootMixin(
     });
     this.component(RestExplorerComponent);
     this.component(ValidatorsComponent);
+    this.component(EntityComponent);
 
     this.projectRoot = __dirname;
     // Customize @loopback/boot Booter Conventions here
@@ -54,21 +53,40 @@ export class MicroCatalogApplication extends BootMixin(
   async boot(): Promise<void> {
     await super.boot();
 
-    const validator = this.getSync<ValidatorService>('services.ValidatorService');
+    // const categoryRepo = this.getSync('repositories.CategoryRepository');
+    // // @ts-ignore
+    // const category: Category[] = await categoryRepo.find({where: {id: '1-cat'}});
 
-    console.log('BOOOOOOOOOOOOOOT');
-    try {
-      await validator.validate({
-        data: {
-          id: '12',
-          name: 'teste',
-          created_at: "2020-01-01T00:00:00.000Z",
-          updated_at: "2020-01-01T00:00:00.000Z"
-        },
-        entityClass: Category,
-      })
-    } catch (e) {
-      console.dir(e, {depth: 8});
-    }
+    // console.log("CATEGORY", category, category[0].id, category[0].name);
+    // // @ts-ignore
+    // categoryRepo.updateById(category[0].id, {
+    //   ...category[0],
+    //   name: 'ok2 loopback'
+    // });
+
+    // const genreRepo = this.getSync('repositories.GenreRepository');
+    // //@ts-ignorets_
+    // genreRepo.updateCategories({
+    //   "id": "1d644412-0d3a-4d30-8757-29ca50a2047",
+    //   "name": "MediumTurquoise2",
+    //   "is_active": true
+    // });
+
+    // const validator = this.getSync<ValidatorService>('services.ValidatorService');
+
+    // console.log('BOOOOOOOOOOOOOOT');
+    // try {
+    //   await validator.validate({
+    //     data: {
+    //       id: '12',
+    //       name: 'teste',
+    //       created_at: "2020-01-01T00:00:00.000Z",
+    //       updated_at: "2020-01-01T00:00:00.000Z"
+    //     },
+    //     entityClass: Category,
+    //   })
+    // } catch (e) {
+    //   console.dir(e, {depth: 8});
+    // }
   }
 }
