@@ -18,7 +18,10 @@ module.exports = {
   rabbitmq: {
     uri: process.env.RABBITMQ_URI,
     defaultHandlerError: parseInt(process.env.RABBITMQ_HANDLER_ERROR),
-    exchanges: [{ name: 'dlx.amq.topic', type: 'topic' }],
+    exchanges: [{
+      name: 'dlx.amq.topic',
+      type: 'topic'
+    }],
     queues: [
       {
         name: 'dlx.sync-videos',
@@ -28,7 +31,7 @@ module.exports = {
         },
         exchange: {
           name: "dlx.amq.topic",
-          routingKey: "model.category.*"
+          routingKey: "model.*.*"
         },
       }
     ],
