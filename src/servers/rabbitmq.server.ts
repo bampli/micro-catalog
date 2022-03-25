@@ -219,34 +219,24 @@ export class RabbitmqServer extends Context implements Server {
   }
 
   private handleNack({channel, message}: {channel: Channel; message: Message}) {
-    const canDeadLetter = this.canDeadLetter({channel, message});
-    if (canDeadLetter) {
-      console.log('Nack in message', {content: message.content.toString()});
+    if (this.isDeadLetter({channel, message})) {
       channel.nack(message, false, false);
+      console.log('Nack in message', {content: message.content.toString()});
     } else {
       channel.ack(message);
+      const queue = message.properties.headers['x-death']![0].queue;
+      console.error(
+        `Ack error in ${queue}, max retries exceeded: ${this.maxAttempts}`
+      );
     }
   }
 
-  private canDeadLetter({
-    channel,
-    message
-  }: {
-    channel: Channel,
-    message: Message
-  }) {
-    if (message.properties.headers && 'x-death' in message.properties.headers) {
-      const count = message.properties.headers['x-death']![0].count;
-      if (count > this.maxAttempts) {
-        channel.ack(message);
-        const queue = message.properties.headers['x-death']![0].queue;
-        console.error(
-          `Ack in ${queue} with error. Max attempts exceeded: ${this.maxAttempts}`
-        );
-        return false;
-      }
-      return true;
-    }
+  private isDeadLetter({channel, message}: {channel: Channel; message: Message}) {
+    return !(
+      message.properties.headers &&
+      'x-death' in message.properties.headers &&
+      message.properties.headers['x-death']![0].count > this.maxAttempts
+    );
   }
 
   async stop(): Promise<void> {
@@ -353,3 +343,21 @@ export class RabbitmqServer extends Context implements Server {
 //     [Symbol(kCapture)]: false
 //   }
 // ]
+
+// Successful connection to RabbitMQ channel
+// Nack in message { content: '{"name": "qqq"}' }
+// Nack in message { content: '{"name": "qqq"}' }
+// Nack in message { content: '{"name": "qqq2"}' }
+// Nack in message { content: '{"name": "qqq"}' }
+// Nack in message { content: '{"name": "qqq3"}' }
+// Nack in message { content: '{"name": "qqq2"}' }
+// Nack in message { content: '{"name": "qqq"}' }
+// Nack in message { content: '{"name": "qqq3"}' }
+// Nack in message { content: '{"name": "qqq2"}' }
+// Ack error in dlx.sync-videos, max retries exceeded: 3
+// Nack in message { content: '{"name": "qqq3"}' }
+// Nack in message { content: '{"name": "qqq2"}' }
+// Nack in message { content: '{"name": "qqq3"}' }
+// Ack error in dlx.sync-videos, max retries exceeded: 3
+// Ack error in dlx.sync-videos, max retries exceeded: 3
+
