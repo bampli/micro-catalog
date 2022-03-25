@@ -226,7 +226,8 @@ export class RabbitmqServer extends Context implements Server {
       channel.ack(message);
       const queue = message.properties.headers['x-death']![0].queue;
       console.error(
-        `Ack error in ${queue}, maximum retries exceeded: ${this.maxAttempts + 1}`
+        `Ack error in ${queue}, maximum retries exceeded: ${this.maxAttempts + 1}, message: `,
+        {content: message.content.toString()}
       );
     }
   }
