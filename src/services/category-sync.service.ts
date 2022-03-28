@@ -5,7 +5,7 @@ import {CategoryRepository} from "../repositories";
 import {Message} from 'amqplib';
 import {BaseModelSyncService} from './base-model-sync.service';
 import {ValidatorService} from './validator.service';
-import {ResponseEnum} from '../servers';
+//import {ResponseEnum} from '../servers';
 
 @bind({scope: BindingScope.SINGLETON})
 export class CategorySyncService extends BaseModelSyncService {
