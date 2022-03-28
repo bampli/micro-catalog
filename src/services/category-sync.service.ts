@@ -25,8 +25,8 @@ export class CategorySyncService extends BaseModelSyncService {
     }
   })
   async handler({data, message}: {data: any, message: Message}) {
-    await this.sleep(10000);
-    return ResponseEnum.NACK;
+    // await this.sleep(10000);
+    // return ResponseEnum.NACK;
     await this.sync({
       repo: this.repo,
       data,
@@ -35,7 +35,7 @@ export class CategorySyncService extends BaseModelSyncService {
   }
 
   // for testing only
-  sleep(ms: number) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
+  // sleep(ms: number) {
+  //   return new Promise(resolve => setTimeout(resolve, ms));
+  // }
 }
