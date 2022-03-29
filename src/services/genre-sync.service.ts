@@ -19,7 +19,10 @@ export class GenreSyncService extends BaseModelSyncService {
   @rabbitmqSubscribe({
     exchange: 'amq.topic',
     queue: 'micro-catalog/sync-videos/genre',
-    routingKey: 'model.genre.*'
+    routingKey: 'model.genre.*',
+    queueOptions: {
+      deadLetterExchange: 'dlx.amq.topic',
+    }
   })
   async handler({data, message}: {data: any, message: Message}) {
     await this.sync({

@@ -19,8 +19,8 @@ export class CastMember extends Entity {
     type: 'string',
     required: true,
     jsonSchema: {
-      minLenght: 1,
-      maxLenght: 255
+      minLength: 1,
+      maxLength: 255
     }
   })
   name: string;

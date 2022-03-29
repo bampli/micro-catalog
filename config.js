@@ -1,3 +1,5 @@
+const { defaultMaxListeners } = require("events");
+
 module.exports = {
   rest: {
     port: +(process.env.PORT ?? 3000),
@@ -16,9 +18,22 @@ module.exports = {
   rabbitmq: {
     uri: process.env.RABBITMQ_URI,
     defaultHandlerError: parseInt(process.env.RABBITMQ_HANDLER_ERROR),
-    // exchanges: [
-    //   {name: 'test1', type: 'direct'},
-    //   {name: 'test2', type: 'direct'},
-    // ]
+    exchanges: [{
+      name: 'dlx.amq.topic',
+      type: 'topic'
+    }],
+    queues: [
+      {
+        name: 'dlx.sync-videos',
+        options: {
+          deadLetterExchange: 'amq.topic',
+          messageTtl: 10000
+        },
+        exchange: {
+          name: "dlx.amq.topic",
+          routingKey: "model.*.*"
+        },
+      }
+    ],
   }
 };

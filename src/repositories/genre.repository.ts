@@ -15,8 +15,9 @@ export class GenreRepository extends BaseRepository<
   ) {
     super(Genre, dataSource);
   }
+}
 
-  // async attachCategories(genreId: typeof Genre.prototype.id, data: object[]) {
+// async attachCategories(genreId: typeof Genre.prototype.id, data: object[]) {
   //   const document = {
   //     index: this.dataSource.settings.index,
   //     refresh: true,
@@ -99,4 +100,3 @@ export class GenreRepository extends BaseRepository<
 
   //   await db.update_by_query(document);
   // }
-}
