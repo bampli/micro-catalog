@@ -1,12 +1,8 @@
 import {Component} from '@loopback/core';
-import {UpdateCastMemberRelationObserver, UpdateCategoryRelationObserver, UpdateGenreRelationObserver} from '../observers';
+import {UpdateCategoryRelationObserver} from '../observers';
 
 export class EntityComponent implements Component {
-  lifeCycleObservers = [
-    UpdateCategoryRelationObserver,
-    UpdateCastMemberRelationObserver,
-    UpdateGenreRelationObserver
-  ];
+  lifeCycleObservers = [UpdateCategoryRelationObserver];
 
 
 }
