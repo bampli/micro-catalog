@@ -21,7 +21,9 @@ export class PaginatorSerializer<T = any> {
       previous = `${this.baseUrl}?${stringify({
         filter: {
           limit: this.limit,
-          ...(this.offset - this.limit >= 0 && {offset: this.offset}),
+          ...(this.offset - this.limit > 0 && {
+            offset: this.offset - this.limit
+          }),
         }
       })}`;
     }
@@ -44,12 +46,12 @@ export class PaginatorSerializer<T = any> {
   }
 
   toJson(req: RequestContext) {
-    this.baseUrl = `${req.requestedBaseUrl}${req.request.url}`;
+    this.baseUrl = `${req.requestedBaseUrl}${req.request.url}`.split('?')[0];
     return instanceToPlain(this);
   }
 
   // toJson(req: RequestContext) {
-  //   this.baseUrl = `${req.requestedBaseUrl}${req.request.url}`;
+  //   this.baseUrl = `${req.requestedBaseUrl}${req.request.url}`.split('?')[0];
   //   return {
   //     results: this.results,
   //     count: this.count,

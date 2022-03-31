@@ -1,7 +1,7 @@
 import {DefaultCrudRepository, Entity, Filter} from '@loopback/repository';
 import {Options} from 'ajv';
 import {Client} from 'es7';
-import {pick} from 'lodash';
+import {parseInt, pick} from 'lodash';
 import {PaginatorSerializer} from '../utils/paginator';
 
 export class BaseRepository<
@@ -13,8 +13,10 @@ export class BaseRepository<
   async paginate(filter?: Filter<T>, options?: Options) {
     const count = (await this.count(filter?.where, options)).count;
     const results = await this.find(filter, options);
-    const limit = filter?.limit ?? this.dataSource.settings.defaultSize;
-    const offset = filter?.offset ?? 0;
+    let limit = filter?.limit ?? this.dataSource.settings.defaultSize;
+    limit = parseInt(limit + '');   // must pass a string parameter
+    let offset = filter?.offset ?? 0;
+    offset = parseInt(offset + '');
     return new PaginatorSerializer<T>(results, count, limit, offset);
   }
 

@@ -1,7 +1,7 @@
 import {inject, Provider} from '@loopback/core';
 import {OperationRetval, RequestContext, Response, Send} from '@loopback/rest';
 import {PaginatorSerializer} from '../utils/paginator';
-import {classToPlain, instanceToPlain} from 'class-transformer';
+import {instanceToPlain} from 'class-transformer';
 
 export class ApiResourceProvider implements Provider<Send> {
 
