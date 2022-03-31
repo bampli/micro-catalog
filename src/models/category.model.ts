@@ -1,4 +1,5 @@
 import {Entity, model, property} from '@loopback/repository';
+//import {Exclude} from 'class-transformer';
 
 export interface SmallCategory {
   id: string;
@@ -29,6 +30,7 @@ export class Category extends Entity {
   })
   name: string;
 
+  //@Exclude()
   @property({
     type: 'string',
     required: false,

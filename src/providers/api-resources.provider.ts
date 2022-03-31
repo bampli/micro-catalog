@@ -1,6 +1,7 @@
 import {inject, Provider} from '@loopback/core';
 import {OperationRetval, RequestContext, Response, Send} from '@loopback/rest';
 import {PaginatorSerializer} from '../utils/paginator';
+import {classToPlain, instanceToPlain} from 'class-transformer';
 
 export class ApiResourceProvider implements Provider<Send> {
 
@@ -12,7 +13,7 @@ export class ApiResourceProvider implements Provider<Send> {
         response.json(
           result instanceof PaginatorSerializer
             ? result.toJson(this.request)
-            : result
+            : instanceToPlain(result)
         );
       };
       response.send();
