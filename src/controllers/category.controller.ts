@@ -72,8 +72,7 @@ export class CategoryController {
         id,
       })
       .build();
-    console.log("NEWFILTER");
-    console.dir(newFilter, {depth: 4});
+    console.log("NEWFILTER", newFilter);
     const obj = await this.categoryRepository.findOne(newFilter);
 
     if (!obj) {
