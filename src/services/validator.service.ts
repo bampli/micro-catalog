@@ -1,6 +1,6 @@
 import {bind, /* inject, */ BindingScope, inject} from '@loopback/core';
-import {repository} from "@loopback/repository";
-import {CategoryRepository} from "../repositories";
+//import {repository} from "@loopback/repository";
+//import {CategoryRepository} from "../repositories";
 import {AjvFactory, getModelSchemaRef, RestBindings, validateRequestBody} from '@loopback/rest';
 
 interface ValidateOptions<T> {
@@ -13,7 +13,7 @@ export class ValidatorService {
   cache = new Map();
 
   constructor(
-    @repository(CategoryRepository) private repo: CategoryRepository,
+    //@repository(CategoryRepository) private repo: CategoryRepository,
     @inject(RestBindings.AJV_FACTORY) private ajvFactory: AjvFactory
   ) { }
 

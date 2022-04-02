@@ -3,7 +3,7 @@ import {Application, CoreBindings, Server} from "@loopback/core";
 import {repository} from "@loopback/repository";
 import {Channel, ConfirmChannel, Message, Options} from "amqplib";
 import {RabbitmqBindings} from '../keys';
-import {CategoryRepository} from "../repositories";
+//import {CategoryRepository} from "../repositories";
 import {AmqpConnectionManager, AmqpConnectionManagerOptions, ChannelWrapper, connect} from 'amqp-connection-manager';
 import {MetadataInspector} from '@loopback/metadata';
 import {RabbitmqSubscribeMetadata, RABBITMQ_SUBSCRIBE_DECORATOR} from '../decorators/rabbitmq-subscribe.decorator';
@@ -38,7 +38,7 @@ export class RabbitmqServer extends Context implements Server {
 
   constructor(
     @inject(CoreBindings.APPLICATION_INSTANCE) public app: Application,
-    @repository(CategoryRepository) private categoryRepo: CategoryRepository,
+    //@repository(CategoryRepository) private categoryRepo: CategoryRepository,
     @inject(RabbitmqBindings.CONFIG) private config: RabbitmqConfig
   ) {
     super(app);
@@ -226,7 +226,7 @@ export class RabbitmqServer extends Context implements Server {
       channel.ack(message);
       const queue = message.properties.headers['x-death']![0].queue;
       console.error(
-        `Ack error in ${queue}, maximum retries exceeded: ${this.maxAttempts + 1}, message:`,
+        `Ack error in ${queue} after ${this.maxAttempts + 1} retries, message:`,
         {content: message.content.toString()}
       );
     }
