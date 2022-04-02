@@ -13,6 +13,7 @@ import {
   getModelSchemaRef,
   response,
 } from '@loopback/rest';
+import {CategoryFilterBuilder} from '../filters/category.filter';
 import {Category} from '../models';
 import {CategoryRepository} from '../repositories';
 import {PaginatorSerializer} from '../utils/paginator';
@@ -49,11 +50,7 @@ export class CategoryController {
   async find(
     @param.filter(Category) filter?: Filter<Category>,
   ): Promise<PaginatorSerializer<Category>> {
-    const newFilter = new FilterBuilder(filter)
-      .where({
-        is_active: true,
-      })
-      .build();
+    const newFilter = new CategoryFilterBuilder(filter).build();
     return this.categoryRepository.paginate(newFilter);
   }
 
@@ -68,14 +65,15 @@ export class CategoryController {
   })
   async findById(
     @param.path.string('id') id: string,
-    @param.filter(Category, {exclude: 'where'}) filter?: Filter<Category>
+    @param.filter(Category) filter?: Filter<Category>
   ): Promise<Category> {
-    const newFilter = new FilterBuilder(filter)
+    const newFilter = new CategoryFilterBuilder(filter)
       .where({
         id,
-        is_active: true,
       })
       .build();
+    console.log("NEWFILTER");
+    console.dir(newFilter, {depth: 4});
     const obj = await this.categoryRepository.findOne(newFilter);
 
     if (!obj) {
@@ -85,3 +83,8 @@ export class CategoryController {
     return obj;
   }
 }
+
+// NEWFILTER {
+//   where: { id: '1c7ae5ca-5718-4dd1-940d-f4e6a5072674', is_active: true }
+// }
+
