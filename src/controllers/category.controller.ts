@@ -14,7 +14,7 @@ import {
   response,
 } from '@loopback/rest';
 import {CategoryFilterBuilder} from '../filters/category.filter';
-import {Category} from '../models';
+import {Category, Genre} from '../models';
 import {CategoryRepository} from '../repositories';
 import {PaginatorSerializer} from '../utils/paginator';
 
@@ -67,12 +67,24 @@ export class CategoryController {
     @param.path.string('id') id: string,
     @param.filter(Category) filter?: Filter<Category>
   ): Promise<Category> {
+
+    // console.log("CATEGORYFILTERBUILDER")
+    // console.dir(new CategoryFilterBuilder({
+    //   where: {
+    //     //@ts-ignore
+    //     'categories.name': 'x'
+    //   },
+    // }).isActiveRelations(Genre)
+    //   .build(),
+    //   {depth: 8}
+    // );
+
     const newFilter = new CategoryFilterBuilder(filter)
       .where({
         id,
       })
       .build();
-    console.log("NEWFILTER", newFilter);
+    //console.log("NEWFILTER", newFilter);
     const obj = await this.categoryRepository.findOne(newFilter);
 
     if (!obj) {
@@ -83,7 +95,13 @@ export class CategoryController {
   }
 }
 
+// CATEGORYFILTERBUILDER CategoryFilterBuilder {
+//   filter: { where: {} },
+//   defaultWhere: { 'categories.name': 'x', is_active: true }
+// }
+
 // NEWFILTER {
 //   where: { id: '1c7ae5ca-5718-4dd1-940d-f4e6a5072674', is_active: true }
 // }
+
 

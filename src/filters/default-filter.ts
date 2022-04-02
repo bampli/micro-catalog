@@ -42,6 +42,8 @@ export abstract class DefaultFilter<
     }
 
     const schema = getJsonSchema(modelCtor);
+    //console.log("SCHEMA", schema);
+
     const relationsFiltered = relations.filter((r) => {
       const jsonSchema = schema.properties?.[r] as JsonSchema;
       if (
@@ -58,6 +60,8 @@ export abstract class DefaultFilter<
     });
 
     const whereStr = JSON.stringify(this.filter.where);
+
+    //  (categories.*|relation2.*|relation3.*)
     const regex = new RegExp(
       `(${relationsFiltered.map((r) => `${r}.*`).join('|')})`,
       'g',
@@ -88,11 +92,24 @@ export abstract class DefaultFilter<
   }
 }
 
-// Getting bigger? Create a 'where' folder
-// class IsActiveWhere extends Where {
-
+// SCHEMA {
+//   title: 'Genre',
+//   type: 'object',
+//   properties: {
+//     id: { type: 'string' },
+//     name: { type: 'string', minLength: 1, maxLength: 255 },
+//     is_active: { type: 'boolean' },
+//     created_at: { type: 'string', format: 'date-time' },
+//     updated_at: { type: 'string', format: 'date-time' },
+//     categories: { type: 'array', items: [Object], uniqueItems: true }
+//   },
+//   required: [ 'id', 'name', 'created_at', 'updated_at' ],
+//   additionalProperties: true
 // }
-
-// class AnotherWhere extends Where {
-
+// CATEGORYFILTERBUILDER CategoryFilterBuilder {
+//   filter: { where: {} },
+//   defaultWhere: { is_active: true }
+// }
+// NEWFILTER {
+//   where: { id: '1c7ae5ca-5718-4dd1-940d-f4e6a5072674', is_active: true }
 // }
