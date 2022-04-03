@@ -14,7 +14,8 @@ import {
   response,
 } from '@loopback/rest';
 import {CategoryFilterBuilder} from '../filters/category.filter';
-import {Category, Genre} from '../models';
+import {Category} from '../models';
+//import {Genre} from '../models';
 import {CategoryRepository} from '../repositories';
 import {PaginatorSerializer} from '../utils/paginator';
 
