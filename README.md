@@ -108,5 +108,6 @@ amqplib @0.8.0
 @types/amqplib @0.8.2
 amqplib amqp-connection-manager @4.1.1
 lodash @4.17.21
+class-transformer @0.5.1
 
 ```

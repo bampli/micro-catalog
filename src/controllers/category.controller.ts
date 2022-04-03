@@ -1,51 +1,29 @@
 import {
   Count,
   CountSchema,
+  EntityNotFoundError,
   Filter,
-  FilterExcludingWhere,
+  FilterBuilder,
   repository,
   Where,
 } from '@loopback/repository';
 import {
-  post,
   param,
   get,
   getModelSchemaRef,
-  patch,
-  put,
-  del,
-  requestBody,
   response,
 } from '@loopback/rest';
+import {CategoryFilterBuilder} from '../filters/category.filter';
 import {Category} from '../models';
+//import {Genre} from '../models';
 import {CategoryRepository} from '../repositories';
+import {PaginatorSerializer} from '../utils/paginator';
 
 export class CategoryController {
   constructor(
     @repository(CategoryRepository)
-    public categoryRepository : CategoryRepository,
-  ) {}
-
-  @post('/categories')
-  @response(200, {
-    description: 'Category model instance',
-    content: {'application/json': {schema: getModelSchemaRef(Category)}},
-  })
-  async create(
-    @requestBody({
-      content: {
-        'application/json': {
-          schema: getModelSchemaRef(Category, {
-            title: 'NewCategory',
-            
-          }),
-        },
-      },
-    })
-    category: Category,
-  ): Promise<Category> {
-    return this.categoryRepository.create(category);
-  }
+    public categoryRepository: CategoryRepository,
+  ) { }
 
   @get('/categories/count')
   @response(200, {
@@ -72,27 +50,21 @@ export class CategoryController {
   })
   async find(
     @param.filter(Category) filter?: Filter<Category>,
-  ): Promise<Category[]> {
-    return this.categoryRepository.find(filter);
-  }
-
-  @patch('/categories')
-  @response(200, {
-    description: 'Category PATCH success count',
-    content: {'application/json': {schema: CountSchema}},
-  })
-  async updateAll(
-    @requestBody({
-      content: {
-        'application/json': {
-          schema: getModelSchemaRef(Category, {partial: true}),
-        },
-      },
-    })
-    category: Category,
-    @param.where(Category) where?: Where<Category>,
-  ): Promise<Count> {
-    return this.categoryRepository.updateAll(category, where);
+  ): Promise<PaginatorSerializer<Category>> {
+    const newFilter = new CategoryFilterBuilder({
+      ...filter,
+      // order: ['_score DESC', '_name DESC'],
+      // where: {
+      //   ['fuzzy' as any]: {
+      //     // name: {
+      //     query: 'FloralWhire',
+      //     fields: ['name', 'description'],
+      //     // fuzziness: 'auto',
+      //     //},
+      //   }
+      // }
+    }).build();
+    return this.categoryRepository.paginate(newFilter);
   }
 
   @get('/categories/{id}')
@@ -106,45 +78,42 @@ export class CategoryController {
   })
   async findById(
     @param.path.string('id') id: string,
-    @param.filter(Category, {exclude: 'where'}) filter?: FilterExcludingWhere<Category>
+    @param.filter(Category) filter?: Filter<Category>
   ): Promise<Category> {
-    return this.categoryRepository.findById(id, filter);
-  }
 
-  @patch('/categories/{id}')
-  @response(204, {
-    description: 'Category PATCH success',
-  })
-  async updateById(
-    @param.path.string('id') id: string,
-    @requestBody({
-      content: {
-        'application/json': {
-          schema: getModelSchemaRef(Category, {partial: true}),
-        },
-      },
-    })
-    category: Category,
-  ): Promise<void> {
-    await this.categoryRepository.updateById(id, category);
-  }
+    // console.log("CATEGORYFILTERBUILDER")
+    // console.dir(new CategoryFilterBuilder({
+    //   where: {
+    //     //@ts-ignore
+    //     'categories.name': 'x'
+    //   },
+    // }).isActiveRelations(Genre)
+    //   .build(),
+    //   {depth: 8}
+    // );
 
-  @put('/categories/{id}')
-  @response(204, {
-    description: 'Category PUT success',
-  })
-  async replaceById(
-    @param.path.string('id') id: string,
-    @requestBody() category: Category,
-  ): Promise<void> {
-    await this.categoryRepository.replaceById(id, category);
-  }
+    const newFilter = new CategoryFilterBuilder(filter)
+      .where({
+        id,
+      })
+      //.order(['name DESC'])   // ordering is also an option
+      .build();
+    //console.log("NEWFILTER", newFilter);
+    const obj = await this.categoryRepository.findOne(newFilter);
 
-  @del('/categories/{id}')
-  @response(204, {
-    description: 'Category DELETE success',
-  })
-  async deleteById(@param.path.string('id') id: string): Promise<void> {
-    await this.categoryRepository.deleteById(id);
+    if (!obj) {
+      throw new EntityNotFoundError(Category, id);
+    }
+
+    return obj;
   }
 }
+
+// CATEGORYFILTERBUILDER CategoryFilterBuilder {
+//   filter: { where: {} },
+//   defaultWhere: { 'categories.name': 'x', is_active: true }
+// }
+
+// NEWFILTER {
+//   where: { id: '1c7ae5ca-5718-4dd1-940d-f4e6a5072674', is_active: true }
+// }
