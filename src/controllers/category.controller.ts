@@ -84,6 +84,7 @@ export class CategoryController {
       .where({
         id,
       })
+      //.order(['name DESC'])   // ordering is also an option
       .build();
     //console.log("NEWFILTER", newFilter);
     const obj = await this.categoryRepository.findOne(newFilter);
