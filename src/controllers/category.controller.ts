@@ -51,7 +51,19 @@ export class CategoryController {
   async find(
     @param.filter(Category) filter?: Filter<Category>,
   ): Promise<PaginatorSerializer<Category>> {
-    const newFilter = new CategoryFilterBuilder(filter).build();
+    const newFilter = new CategoryFilterBuilder({
+      ...filter,
+      // order: ['_score DESC', '_name DESC'],
+      // where: {
+      //   ['fuzzy' as any]: {
+      //     // name: {
+      //     query: 'FloralWhire',
+      //     fields: ['name', 'description'],
+      //     // fuzziness: 'auto',
+      //     //},
+      //   }
+      // }
+    }).build();
     return this.categoryRepository.paginate(newFilter);
   }
 
@@ -105,5 +117,3 @@ export class CategoryController {
 // NEWFILTER {
 //   where: { id: '1c7ae5ca-5718-4dd1-940d-f4e6a5072674', is_active: true }
 // }
-
-
