@@ -3,7 +3,6 @@ import {
   CountSchema,
   EntityNotFoundError,
   Filter,
-  FilterBuilder,
   repository,
   Where,
 } from '@loopback/repository';

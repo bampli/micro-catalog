@@ -46,21 +46,18 @@ export class Category extends Entity {
     required: false,
     default: true
   })
-  // eslint-disable-next-line @typescript-eslint/naming-convention
   is_active: boolean;
 
   @property({
     type: 'date',
     required: true,
   })
-  // eslint-disable-next-line @typescript-eslint/naming-convention
   created_at: string; // ISO 8601 YYYY-MM-DDT00:00:00
 
   @property({
     type: 'date',
     required: true,
   })
-  // eslint-disable-next-line @typescript-eslint/naming-convention
   updated_at: string; // ISO 8601 YYYY-MM-DDT00:00:00
 
   constructor(data?: Partial<Category>) {
