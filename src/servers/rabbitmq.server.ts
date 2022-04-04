@@ -1,6 +1,6 @@
 import {Binding, Context, inject} from "@loopback/context";
 import {Application, CoreBindings, Server} from "@loopback/core";
-import {repository} from "@loopback/repository";
+//import {repository} from "@loopback/repository";
 import {Channel, ConfirmChannel, Message, Options} from "amqplib";
 import {RabbitmqBindings} from '../keys';
 //import {CategoryRepository} from "../repositories";

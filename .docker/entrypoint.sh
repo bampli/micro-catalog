@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 npm config set cache /home/node/app/.npm-cache --global
 
