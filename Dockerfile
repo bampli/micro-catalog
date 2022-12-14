@@ -8,5 +8,5 @@ RUN npm install -g nodemon
 RUN npm install -g @loopback/cli
 
 RUN mkdir -p /home/node/app
-user node
+USER node
 WORKDIR /home/node/app

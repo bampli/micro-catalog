@@ -10,7 +10,7 @@ describe('HomePage', () => {
     ({app, client} = await setupApplication());
   });
 
-  beforeEach(clearDb);    // repeat for each test
+  beforeEach(clearDb); // repeat for each test
 
   after(async () => {
     await app.stop();
@@ -20,8 +20,7 @@ describe('HomePage', () => {
     const response = await client.get('/categories').expect(200);
     expect(response.body).to.containDeep({
       results: [],
-      count: 0
+      count: 0,
     });
   });
-
 });
